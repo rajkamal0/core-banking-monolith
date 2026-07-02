@@ -52,7 +52,6 @@ public class AccountService {
 		return "Balance check failed for Account " + accountNum;
 	}
 
-	@Transactional
 	public String debitBalance(Integer accountNum, BigDecimal amount) {
 		Account acc = accountRepository.findById(accountNum).get();
 		
@@ -72,7 +71,6 @@ public class AccountService {
 		
 	}
 	
-	@Transactional
 	public String creditBalance(Integer accountNum, BigDecimal amount) {
 		Account acc = accountRepository.findById(accountNum).get();
 		
