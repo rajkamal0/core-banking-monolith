@@ -3,10 +3,12 @@ package fintrack_monolith.account;
 import java.math.BigDecimal;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import fintrack_monolith.customer.Customer;
 import fintrack_monolith.customer.CustomerRepository;
-import jakarta.transaction.Transactional;
+
 
 @Service
 public class AccountService {
@@ -52,6 +54,7 @@ public class AccountService {
 		return "Balance check failed for Account " + accountNum;
 	}
 
+	@Transactional(propagation = Propagation.MANDATORY)
 	public String debitBalance(Integer accountNum, BigDecimal amount) {
 		Account acc = accountRepository.findById(accountNum).get();
 		
@@ -71,6 +74,7 @@ public class AccountService {
 		
 	}
 	
+	@Transactional(propagation = Propagation.MANDATORY)
 	public String creditBalance(Integer accountNum, BigDecimal amount) {
 		Account acc = accountRepository.findById(accountNum).get();
 		
