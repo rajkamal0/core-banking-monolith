@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import fintrack_monolith.account.AccountService;
+
 
 
 @Service
@@ -13,6 +15,9 @@ public class TransactionService {
 	
 	@Autowired
 	TransactionRepository transactionRepository;
+	
+	@Autowired
+	AccountService accountService;
 	
 	@Transactional
 	public Transaction processTransaction(int fromAccount, int toAccount, BigDecimal amount, char transactionType) {
@@ -26,6 +31,7 @@ public class TransactionService {
 	@Transactional
 	public Transaction deposit(Transaction transaction) {
 		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
