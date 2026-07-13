@@ -2,13 +2,9 @@ package fintrack_monolith.gl;
 
 import java.math.BigDecimal;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
-import fintrack_monolith.account.Account;
-import fintrack_monolith.customer.Customer;
 
 //Credit & Debit GL methods are written considering only Cash GL (Asset GL) is maintained
 
