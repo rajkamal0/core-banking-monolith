@@ -89,6 +89,22 @@ public class TransactionService {
 		if (originalTransaction.getTxnType()=='R'){
 			return null; //"Cannot reverse a reversed transaction" -  throw this error
 		}
+		
+	    char originalType = originalTransaction.getTxnType();
+	    
+	    if (originalType == 'D') { 
+	        generalLedgerService.creditAssetGL(originalTransaction.getDebitAccount(), originalTransaction.getAmount(), originalTransaction.getCcyCode());
+	        accountService.debitBalance(originalTransaction.getCreditAccount(), originalTransaction.getAmount(), originalTransaction.getCcyCode());
+	        
+	    } else if (originalType == 'W') { 
+	        accountService.creditBalance(originalTransaction.getDebitAccount(), originalTransaction.getAmount(), originalTransaction.getCcyCode());
+	        generalLedgerService.debitAssetGL(originalTransaction.getCreditAccount(), originalTransaction.getAmount(), originalTransaction.getCcyCode());
+	        
+	    } else if (originalType == 'T') { 
+	        accountService.creditBalance(originalTransaction.getDebitAccount(), originalTransaction.getAmount(), originalTransaction.getCcyCode());
+	        accountService.debitBalance(originalTransaction.getCreditAccount(), originalTransaction.getAmount(), originalTransaction.getCcyCode());
+	    }
+	    
 		return saveTransaction(originalTransaction.getCreditAccount(), originalTransaction.getDebitAccount(),
 							   originalTransaction.getAmount(), 'R', originalTransaction.getCcyCode());
 		

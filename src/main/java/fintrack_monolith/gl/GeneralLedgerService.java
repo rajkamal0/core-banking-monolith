@@ -23,7 +23,7 @@ public class GeneralLedgerService {
 		if (gl.getGlStatus() != 'A') {
 			return false;
 		}
-		if(gl.getCcyCode() != ccy) {
+		if(!gl.getCcyCode().equals(ccy)) {
 			return false;
 		}
 		return true;
@@ -41,6 +41,10 @@ public class GeneralLedgerService {
 		
 		BigDecimal currBalance = gl.getBalance();
 		BigDecimal newBalance = currBalance.add(amount);
+		
+		gl.setBalance(newBalance);
+		generalLedgerRepository.save(gl);
+		
 		return "Debited Rs." + amount + " to the Asset GL: " + glNum + "\nUpdated Balance is " + newBalance;
 		
 	}
@@ -62,6 +66,10 @@ public class GeneralLedgerService {
 		}
 		
 		BigDecimal newBalance = currBalance.subtract(amount);
+		
+		gl.setBalance(newBalance);
+		generalLedgerRepository.save(gl);
+		
 		return "Credited Rs." + amount + " from the Asset GL: " + glNum + "\nUpdated Balance is " + newBalance;
 	}
 	
@@ -76,6 +84,10 @@ public class GeneralLedgerService {
 		
 		BigDecimal currBalance = gl.getBalance();
 		BigDecimal newBalance = currBalance.add(amount);
+		
+		gl.setBalance(newBalance);
+		generalLedgerRepository.save(gl);
+		
 		return "Debited Rs." + amount + " to the Liability GL: " + glNum + "\nUpdated Balance is " + newBalance;
 		
 	}
@@ -97,6 +109,10 @@ public class GeneralLedgerService {
 		}
 		
 		BigDecimal newBalance = currBalance.subtract(amount);
+		
+		gl.setBalance(newBalance);
+		generalLedgerRepository.save(gl);
+		
 		return "Credited Rs." + amount + " from the Liability GL: " + glNum + "\nUpdated Balance is " + newBalance;
 	}
 	

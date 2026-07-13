@@ -27,7 +27,7 @@ public class AccountService {
 		if (acc.getAccountStatus() != 'A') {
 			return false;
 		}
-		if(acc.getCcyCode() != ccy) {
+		if(!acc.getCcyCode().equals(ccy)) {
 			return false;
 		}
 		return true;
@@ -83,6 +83,10 @@ public class AccountService {
 		}
 		
 		BigDecimal newBalance = currBalance.subtract(amount);
+		
+		acc.setBalance(newBalance);
+		accountRepository.save(acc);
+		
 		return "Debited Rs." + amount + " from the account: " + accountNum + "\nUpdated Balance is " + newBalance;
 		
 	}
@@ -98,6 +102,10 @@ public class AccountService {
 		
 		BigDecimal currBalance = acc.getBalance();
 		BigDecimal newBalance = currBalance.add(amount);
+		
+		acc.setBalance(newBalance);
+		accountRepository.save(acc);
+		
 		return "Credited Rs." + amount + " to the account: " + accountNum + "\nUpdated Balance is " + newBalance;
 		
 	}
