@@ -19,38 +19,73 @@ public class GeneralLedgerService {
 	GeneralLedgerRepository generalLedgerRepository;
 	
 	@Transactional(propagation = Propagation.MANDATORY)
-	public String debitGL(Integer glNum, BigDecimal amount) {
+	public String debitAssetGL(Integer glNum, BigDecimal amount) {
 		
 		GeneralLedger gl = generalLedgerRepository.findById(glNum).get();
 		
 		if(gl.getGlStatus() != 'A') {
-			return "GL " + glNum + " is not active";
+			return "Asset GL " + glNum + " is not active";
 		}
 		
 		BigDecimal currBalance = gl.getBalance();
 		BigDecimal newBalance = currBalance.add(amount);
-		return "Debited Rs." + amount + " to the GL: " + glNum + "\nUpdated Balance is " + newBalance;
+		return "Debited Rs." + amount + " to the Asset GL: " + glNum + "\nUpdated Balance is " + newBalance;
 		
 	}
 	
 	@Transactional(propagation = Propagation.MANDATORY)
-	public String creditGL(Integer glNum, BigDecimal amount) {
+	public String creditAssetGL(Integer glNum, BigDecimal amount) {
 		
 		GeneralLedger gl = generalLedgerRepository.findById(glNum).get();
 		
 		if(gl.getGlStatus() != 'A') {
-			return "GL " + glNum + " is not active";
+			return "Asset GL " + glNum + " is not active";
 		}
 		
 		BigDecimal currBalance = gl.getBalance();
 		int comparison = currBalance.compareTo(amount);
 		
 		if (comparison<0) {
-			return "GL " + glNum + " is not having sufficient funds";
+			return "Asset GL " + glNum + " is not having sufficient funds";
 		}
 		
 		BigDecimal newBalance = currBalance.subtract(amount);
-		return "Credited Rs." + amount + " from the GL: " + glNum + "\nUpdated Balance is " + newBalance;
+		return "Credited Rs." + amount + " from the Asset GL: " + glNum + "\nUpdated Balance is " + newBalance;
+	}
+	
+	@Transactional(propagation = Propagation.MANDATORY)
+	public String creditLiabilityGL(Integer glNum, BigDecimal amount) {
+		
+		GeneralLedger gl = generalLedgerRepository.findById(glNum).get();
+		
+		if(gl.getGlStatus() != 'A') {
+			return "Liability GL " + glNum + " is not active";
+		}
+		
+		BigDecimal currBalance = gl.getBalance();
+		BigDecimal newBalance = currBalance.add(amount);
+		return "Debited Rs." + amount + " to the Liability GL: " + glNum + "\nUpdated Balance is " + newBalance;
+		
+	}
+	
+	@Transactional(propagation = Propagation.MANDATORY)
+	public String debitLiabilityGL(Integer glNum, BigDecimal amount) {
+		
+		GeneralLedger gl = generalLedgerRepository.findById(glNum).get();
+		
+		if(gl.getGlStatus() != 'A') {
+			return "Liability GL " + glNum + " is not active";
+		}
+		
+		BigDecimal currBalance = gl.getBalance();
+		int comparison = currBalance.compareTo(amount);
+		
+		if (comparison<0) {
+			return "Liability GL " + glNum + " is not having sufficient funds";
+		}
+		
+		BigDecimal newBalance = currBalance.subtract(amount);
+		return "Credited Rs." + amount + " from the Liability GL: " + glNum + "\nUpdated Balance is " + newBalance;
 	}
 	
 	public String fetchBalance(Integer glNum) {
