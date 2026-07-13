@@ -15,8 +15,12 @@ import fintrack_monolith.customer.Customer;
 @Service
 public class GeneralLedgerService {
 	
-	@Autowired
-	GeneralLedgerRepository generalLedgerRepository;
+	private GeneralLedgerRepository generalLedgerRepository;
+	
+	public GeneralLedgerService(GeneralLedgerRepository generalLedgerRepository) {
+		this.generalLedgerRepository = generalLedgerRepository;
+	}
+	 
 	
 	@Transactional(propagation = Propagation.MANDATORY)
 	public String debitAssetGL(Integer glNum, BigDecimal amount) {
