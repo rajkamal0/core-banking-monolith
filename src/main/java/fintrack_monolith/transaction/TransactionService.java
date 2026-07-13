@@ -53,9 +53,9 @@ public class TransactionService {
 	public Transaction deposit(Transaction transaction) {
 		
 		// transaction starts
-		generalLedgerService.debitAssetGL(transaction.getDebitAccount(), transaction.getAmount());
+		generalLedgerService.debitAssetGL(transaction.getDebitAccount(), transaction.getAmount(), transaction.getCcyCode());
 		//debit done
-		accountService.creditBalance(transaction.getCreditAccount(), transaction.getAmount());
+		accountService.creditBalance(transaction.getCreditAccount(), transaction.getAmount(), transaction.getCcyCode());
 		//credit done
 		
 		return saveTransaction(transaction.getDebitAccount(), transaction.getCreditAccount(),
@@ -65,8 +65,8 @@ public class TransactionService {
 	@Transactional
 	public Transaction withdrawl(Transaction transaction) {
 		
-		accountService.debitBalance(transaction.getDebitAccount(), transaction.getAmount());
-		generalLedgerService.creditAssetGL(transaction.getCreditAccount(), transaction.getAmount());
+		accountService.debitBalance(transaction.getDebitAccount(), transaction.getAmount(), transaction.getCcyCode());
+		generalLedgerService.creditAssetGL(transaction.getCreditAccount(), transaction.getAmount(), transaction.getCcyCode());
 		
 		return saveTransaction(transaction.getDebitAccount(), transaction.getCreditAccount(),
 							   transaction.getAmount(), 'W', transaction.getCcyCode());				
@@ -74,8 +74,8 @@ public class TransactionService {
 
 	@Transactional
 	public Transaction transfer(Transaction transaction) {
-		accountService.debitBalance(transaction.getDebitAccount(), transaction.getAmount());
-		accountService.creditBalance(transaction.getCreditAccount(), transaction.getAmount());
+		accountService.debitBalance(transaction.getDebitAccount(), transaction.getAmount(), transaction.getCcyCode());
+		accountService.creditBalance(transaction.getCreditAccount(), transaction.getAmount(), transaction.getCcyCode());
 		
 		return saveTransaction(transaction.getDebitAccount(), transaction.getCreditAccount(),
 				   transaction.getAmount(), 'T', transaction.getCcyCode());	

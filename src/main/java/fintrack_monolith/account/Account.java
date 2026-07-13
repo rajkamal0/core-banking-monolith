@@ -38,6 +38,9 @@ public class Account {
 	@Column(name="CUSTOMER_NO")
 	private Integer customerID;
 	
+	@Column(name="CCY_CODE")
+	private String ccyCode;
+	
 	@Column(name="ACC_BALANCE")
 	private BigDecimal balance;
 	

@@ -21,6 +21,18 @@ public class AccountService {
 		this.customerRepository = customerRepository;
 	}
 	
+	private boolean validateAccount(Integer accountNum, String ccy) {
+		Account acc = accountRepository.findById(accountNum).get();
+		
+		if (acc.getAccountStatus() != 'A') {
+			return false;
+		}
+		if(acc.getCcyCode() != ccy) {
+			return false;
+		}
+		return true;
+	}
+	
 	@Transactional
 	public Account createAccount(Account accountDetails) {
 		
@@ -55,12 +67,13 @@ public class AccountService {
 	}
 
 	@Transactional(propagation = Propagation.MANDATORY)
-	public String debitBalance(Integer accountNum, BigDecimal amount) {
-		Account acc = accountRepository.findById(accountNum).get();
+	public String debitBalance(Integer accountNum, BigDecimal amount, String ccyCode) {
 		
-		if (acc.getAccountStatus() != 'A') {
-			return "Account " + accountNum + " is not active";
+		if (!validateAccount(accountNum, ccyCode)) {
+			return null;
 		}
+		
+		Account acc = accountRepository.findById(accountNum).get();
 		
 		BigDecimal currBalance = acc.getBalance();
 		int comparison = currBalance.compareTo(amount);
@@ -75,12 +88,13 @@ public class AccountService {
 	}
 	
 	@Transactional(propagation = Propagation.MANDATORY)
-	public String creditBalance(Integer accountNum, BigDecimal amount) {
-		Account acc = accountRepository.findById(accountNum).get();
+	public String creditBalance(Integer accountNum, BigDecimal amount, String ccyCode) {
 		
-		if (acc.getAccountStatus() != 'A') {
-			return "Account " + accountNum + " is not active";
+		if (!validateAccount(accountNum, ccyCode)) {
+			return null;
 		}
+		
+		Account acc = accountRepository.findById(accountNum).get();
 		
 		BigDecimal currBalance = acc.getBalance();
 		BigDecimal newBalance = currBalance.add(amount);

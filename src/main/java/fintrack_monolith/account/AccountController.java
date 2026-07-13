@@ -35,12 +35,12 @@ public class AccountController {
 	}
 	
 	@PutMapping("debit/{accountNum}")
-	public String debitBalance(@PathVariable Integer accountNum, BigDecimal amount) {
-		return accountService.debitBalance(accountNum, amount);
+	public String debitBalance(@PathVariable Integer accountNum, BigDecimal amount, String ccyCode) {
+		return accountService.debitBalance(accountNum, amount, ccyCode);
 	}
 	
 	@PutMapping("credit/{accountNum}")
-	public String creditBalance(@PathVariable Integer accountNum, BigDecimal amount) {
-		return accountService.creditBalance(accountNum, amount);
+	public String creditBalance(@PathVariable Integer accountNum, BigDecimal amount, String ccyCode) {
+		return accountService.creditBalance(accountNum, amount, ccyCode);
 	}
 }

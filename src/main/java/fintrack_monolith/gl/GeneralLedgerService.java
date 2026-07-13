@@ -20,16 +20,28 @@ public class GeneralLedgerService {
 	public GeneralLedgerService(GeneralLedgerRepository generalLedgerRepository) {
 		this.generalLedgerRepository = generalLedgerRepository;
 	}
+	
+	private boolean validateGL(Integer glNum, String ccy) {
+		GeneralLedger gl = generalLedgerRepository.findById(glNum).get();
+		
+		if (gl.getGlStatus() != 'A') {
+			return false;
+		}
+		if(gl.getCcyCode() != ccy) {
+			return false;
+		}
+		return true;
+	}
 	 
 	
 	@Transactional(propagation = Propagation.MANDATORY)
-	public String debitAssetGL(Integer glNum, BigDecimal amount) {
+	public String debitAssetGL(Integer glNum, BigDecimal amount, String ccyCode) {
+		
+		if (!validateGL(glNum, ccyCode)) {
+			return null;
+		}
 		
 		GeneralLedger gl = generalLedgerRepository.findById(glNum).get();
-		
-		if(gl.getGlStatus() != 'A') {
-			return "Asset GL " + glNum + " is not active";
-		}
 		
 		BigDecimal currBalance = gl.getBalance();
 		BigDecimal newBalance = currBalance.add(amount);
@@ -38,13 +50,13 @@ public class GeneralLedgerService {
 	}
 	
 	@Transactional(propagation = Propagation.MANDATORY)
-	public String creditAssetGL(Integer glNum, BigDecimal amount) {
+	public String creditAssetGL(Integer glNum, BigDecimal amount, String ccyCode) {
+		
+		if (!validateGL(glNum, ccyCode)) {
+			return null;
+		}
 		
 		GeneralLedger gl = generalLedgerRepository.findById(glNum).get();
-		
-		if(gl.getGlStatus() != 'A') {
-			return "Asset GL " + glNum + " is not active";
-		}
 		
 		BigDecimal currBalance = gl.getBalance();
 		int comparison = currBalance.compareTo(amount);
@@ -58,13 +70,13 @@ public class GeneralLedgerService {
 	}
 	
 	@Transactional(propagation = Propagation.MANDATORY)
-	public String creditLiabilityGL(Integer glNum, BigDecimal amount) {
+	public String creditLiabilityGL(Integer glNum, BigDecimal amount, String ccyCode) {
+		
+		if (!validateGL(glNum, ccyCode)) {
+			return null;
+		}
 		
 		GeneralLedger gl = generalLedgerRepository.findById(glNum).get();
-		
-		if(gl.getGlStatus() != 'A') {
-			return "Liability GL " + glNum + " is not active";
-		}
 		
 		BigDecimal currBalance = gl.getBalance();
 		BigDecimal newBalance = currBalance.add(amount);
@@ -73,13 +85,13 @@ public class GeneralLedgerService {
 	}
 	
 	@Transactional(propagation = Propagation.MANDATORY)
-	public String debitLiabilityGL(Integer glNum, BigDecimal amount) {
+	public String debitLiabilityGL(Integer glNum, BigDecimal amount, String ccyCode) {
+		
+		if (!validateGL(glNum, ccyCode)) {
+			return null;
+		}
 		
 		GeneralLedger gl = generalLedgerRepository.findById(glNum).get();
-		
-		if(gl.getGlStatus() != 'A') {
-			return "Liability GL " + glNum + " is not active";
-		}
 		
 		BigDecimal currBalance = gl.getBalance();
 		int comparison = currBalance.compareTo(amount);

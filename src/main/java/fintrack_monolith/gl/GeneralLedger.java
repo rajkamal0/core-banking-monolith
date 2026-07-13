@@ -34,6 +34,9 @@ public class GeneralLedger {
 	@Column(name="GL_BALANCE")
 	private BigDecimal balance;
 	
+	@Column(name="CCY_CODE")
+	private String ccyCode;
+	
 	@Version
 	@Column(name="VERSION")
 	private Integer version;
