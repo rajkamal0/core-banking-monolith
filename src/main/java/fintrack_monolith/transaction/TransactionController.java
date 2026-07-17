@@ -1,6 +1,7 @@
 package fintrack_monolith.transaction;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,8 +31,13 @@ public class TransactionController {
 	}
 	
 	@PostMapping("/reversal/{transactionID}")
-	public Transaction reversal(@PathVariable int transactionID) {
+	public Transaction reversal(@PathVariable Integer transactionID) {
 		return transactionService.reversal(transactionID);
+	}
+	
+	@GetMapping("/findtransaction/{transactionID}")
+	public Transaction getTransaction (@PathVariable Integer transactionID) {
+		return transactionService.getTransaction(transactionID);
 	}
 	
 }

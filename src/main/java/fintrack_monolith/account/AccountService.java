@@ -8,6 +8,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import fintrack_monolith.customer.Customer;
 import fintrack_monolith.customer.CustomerRepository;
+import fintrack_monolith.exception.InsufficientFundsException;
+import fintrack_monolith.exception.ResourceNotFoundException;
+import fintrack_monolith.transaction.Transaction;
 
 
 @Service
@@ -22,7 +25,8 @@ public class AccountService {
 	}
 	
 	private boolean validateAccount(Integer accountNum, String ccy) {
-		Account acc = accountRepository.findById(accountNum).get();
+		Account acc = accountRepository.findById(accountNum).orElseThrow(
+				() -> new ResourceNotFoundException("Account not found with Account Number: " + accountNum));
 		
 		if (acc.getAccountStatus() != 'A') {
 			return false;
@@ -36,7 +40,8 @@ public class AccountService {
 	@Transactional
 	public Account createAccount(Account accountDetails) {
 		
-		Customer customer = customerRepository.findById(accountDetails.getCustomerID()).get();
+		Customer customer = customerRepository.findById(accountDetails.getCustomerID()).orElseThrow(
+								() -> new ResourceNotFoundException("Account not found with Account Number: " + accountDetails.getAccountNum()));
 		if (!customer.getKycStatus()) {
 			return null;
 		}
@@ -48,7 +53,8 @@ public class AccountService {
 
 	
 	public String deleteAccount(Integer accountNum) {
-		Account acc = accountRepository.findById(accountNum).get();
+		Account acc = accountRepository.findById(accountNum).orElseThrow(
+				() -> new ResourceNotFoundException("Account not found with Account Number: " + accountNum));
 		
 		if (acc.getAccountStatus()=='A') {
 			acc.setAccountStatus('C');
@@ -59,27 +65,30 @@ public class AccountService {
 	}
 
 	public String fetchBalance(Integer accountNum) {
-		Account acc = accountRepository.findById(accountNum).get();
+		Account acc = accountRepository.findById(accountNum).orElseThrow(
+				() -> new ResourceNotFoundException("Account not found with Account Number: " + accountNum));
 		
 		if (acc != null && acc.getAccountNum() != null)
 			return "Balance in Account " + accountNum + " is " + acc.getBalance();
-		return "Balance check failed for Account " + accountNum;
+		 return "Balance check failed for Account " + accountNum;
 	}
 
 	@Transactional(propagation = Propagation.MANDATORY)
 	public String debitBalance(Integer accountNum, BigDecimal amount, String ccyCode) {
 		
 		if (!validateAccount(accountNum, ccyCode)) {
-			return null;
+			return "Account " + accountNum + " failed in validation";
 		}
 		
-		Account acc = accountRepository.findById(accountNum).get();
+		Account acc = accountRepository.findById(accountNum).orElseThrow(
+				() -> new ResourceNotFoundException("Account not found with Account Number: " + accountNum));
 		
 		BigDecimal currBalance = acc.getBalance();
 		int comparison = currBalance.compareTo(amount);
 		
 		if (comparison<0) {
-			return "Account " + accountNum + " is not having sufficient funds";
+			throw new InsufficientFundsException("Account " + accountNum + " is not having sufficient funds");
+			// return "Account " + accountNum + " is not having sufficient funds";
 		}
 		
 		BigDecimal newBalance = currBalance.subtract(amount);
@@ -95,10 +104,11 @@ public class AccountService {
 	public String creditBalance(Integer accountNum, BigDecimal amount, String ccyCode) {
 		
 		if (!validateAccount(accountNum, ccyCode)) {
-			return null;
+			return "Account " + accountNum + " failed in validation";
 		}
 		
-		Account acc = accountRepository.findById(accountNum).get();
+		Account acc = accountRepository.findById(accountNum).orElseThrow(
+				() -> new ResourceNotFoundException("Account not found with Account Number: " + accountNum));
 		
 		BigDecimal currBalance = acc.getBalance();
 		BigDecimal newBalance = currBalance.add(amount);
@@ -108,6 +118,12 @@ public class AccountService {
 		
 		return "Credited Rs." + amount + " to the account: " + accountNum + "\nUpdated Balance is " + newBalance;
 		
+	}
+	
+	public Account getAccountDetails (Integer accountNum) {		
+		return accountRepository.findById(accountNum).orElseThrow(
+				() -> new ResourceNotFoundException("Account " + accountNum + " not found"));
+
 	}
 
 }

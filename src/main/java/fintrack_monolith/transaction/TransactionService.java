@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import fintrack_monolith.account.AccountService;
+import fintrack_monolith.exception.ResourceNotFoundException;
 import fintrack_monolith.gl.GeneralLedgerService;
 
 
@@ -82,9 +83,10 @@ public class TransactionService {
 	}
 
 	@Transactional
-	public Transaction reversal(int transactionID) {
+	public Transaction reversal(Integer transactionID) {
 		
-		Transaction originalTransaction = transactionRepository.findById(transactionID).get();
+		Transaction originalTransaction = transactionRepository.findById(transactionID).orElseThrow(
+				() -> new ResourceNotFoundException("Transaction " + transactionID + " not found"));
 		
 		if (originalTransaction.getTxnType()=='R'){
 			return null; //"Cannot reverse a reversed transaction" -  throw this error
@@ -108,6 +110,12 @@ public class TransactionService {
 		return saveTransaction(originalTransaction.getCreditAccount(), originalTransaction.getDebitAccount(),
 							   originalTransaction.getAmount(), 'R', originalTransaction.getCcyCode());
 		
+	}
+	
+	public Transaction getTransaction (Integer transactionID) {		
+		return transactionRepository.findById(transactionID).orElseThrow(
+				() -> new ResourceNotFoundException("Transaction " + transactionID + " not found"));
+
 	}
 
 }

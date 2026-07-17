@@ -6,6 +6,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import fintrack_monolith.account.Account;
+import fintrack_monolith.exception.InsufficientFundsException;
+import fintrack_monolith.exception.ResourceNotFoundException;
+
 //Credit & Debit GL methods are written considering only Cash GL (Asset GL) is maintained
 
 @Service
@@ -18,7 +22,8 @@ public class GeneralLedgerService {
 	}
 	
 	private boolean validateGL(Integer glNum, String ccy) {
-		GeneralLedger gl = generalLedgerRepository.findById(glNum).get();
+		GeneralLedger gl = generalLedgerRepository.findById(glNum).orElseThrow(
+				() -> new ResourceNotFoundException("GL " + glNum + " not found"));
 		
 		if (gl.getGlStatus() != 'A') {
 			return false;
@@ -37,7 +42,8 @@ public class GeneralLedgerService {
 			return null;
 		}
 		
-		GeneralLedger gl = generalLedgerRepository.findById(glNum).get();
+		GeneralLedger gl = generalLedgerRepository.findById(glNum).orElseThrow(
+				() -> new ResourceNotFoundException("GL " + glNum + " not found"));
 		
 		BigDecimal currBalance = gl.getBalance();
 		BigDecimal newBalance = currBalance.add(amount);
@@ -56,13 +62,15 @@ public class GeneralLedgerService {
 			return null;
 		}
 		
-		GeneralLedger gl = generalLedgerRepository.findById(glNum).get();
+		GeneralLedger gl = generalLedgerRepository.findById(glNum).orElseThrow(
+				() -> new ResourceNotFoundException("GL " + glNum + " not found"));
 		
 		BigDecimal currBalance = gl.getBalance();
 		int comparison = currBalance.compareTo(amount);
 		
 		if (comparison<0) {
-			return "Asset GL " + glNum + " is not having sufficient funds";
+			throw new InsufficientFundsException("Asset GL " + glNum + " is not having sufficient funds");
+			// return "Asset GL " + glNum + " is not having sufficient funds";
 		}
 		
 		BigDecimal newBalance = currBalance.subtract(amount);
@@ -80,7 +88,8 @@ public class GeneralLedgerService {
 			return null;
 		}
 		
-		GeneralLedger gl = generalLedgerRepository.findById(glNum).get();
+		GeneralLedger gl = generalLedgerRepository.findById(glNum).orElseThrow(
+				() -> new ResourceNotFoundException("GL " + glNum + " not found"));
 		
 		BigDecimal currBalance = gl.getBalance();
 		BigDecimal newBalance = currBalance.add(amount);
@@ -99,13 +108,15 @@ public class GeneralLedgerService {
 			return null;
 		}
 		
-		GeneralLedger gl = generalLedgerRepository.findById(glNum).get();
+		GeneralLedger gl = generalLedgerRepository.findById(glNum).orElseThrow(
+				() -> new ResourceNotFoundException("GL " + glNum + " not found"));
 		
 		BigDecimal currBalance = gl.getBalance();
 		int comparison = currBalance.compareTo(amount);
 		
 		if (comparison<0) {
-			return "Liability GL " + glNum + " is not having sufficient funds";
+			throw new InsufficientFundsException("Liability GL " + glNum + " is not having sufficient funds");
+			// return "Liability GL " + glNum + " is not having sufficient funds";
 		}
 		
 		BigDecimal newBalance = currBalance.subtract(amount);
@@ -117,7 +128,8 @@ public class GeneralLedgerService {
 	}
 	
 	public String fetchBalance(Integer glNum) {
-		GeneralLedger gl = generalLedgerRepository.findById(glNum).get();
+		GeneralLedger gl = generalLedgerRepository.findById(glNum).orElseThrow(
+				() -> new ResourceNotFoundException("GL " + glNum + " not found"));
 		
 		if (gl != null && gl.getGlNum() != null)
 			return "Balance in GL " + glNum + " is " + gl.getBalance();
@@ -133,15 +145,22 @@ public class GeneralLedgerService {
 	}
 
 	
-	public String deleteGL(Integer GLNum) {
-		GeneralLedger gl = generalLedgerRepository.findById(GLNum).get();
+	public String deleteGL(Integer glNum) {
+		GeneralLedger gl = generalLedgerRepository.findById(glNum).orElseThrow(
+				() -> new ResourceNotFoundException("GL " + glNum + " not found"));
 		
 		if (gl.getGlStatus()=='A') {
 			gl.setGlStatus('C');
-			return "GL " + GLNum + " deletion success";
+			return "GL " + glNum + " deletion success";
 		}
 		
-		return "GL " + GLNum + " deletion failed";
+		return "GL " + glNum + " deletion failed";
+	}
+	
+	public GeneralLedger getGLDetails (Integer glNum) {		
+		return generalLedgerRepository.findById(glNum).orElseThrow(
+				() -> new ResourceNotFoundException("GL " + glNum + " not found"));
+
 	}
 
 }

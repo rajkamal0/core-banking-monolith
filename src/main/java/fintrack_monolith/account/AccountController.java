@@ -43,4 +43,9 @@ public class AccountController {
 	public String creditBalance(@PathVariable Integer accountNum, BigDecimal amount, String ccyCode) {
 		return accountService.creditBalance(accountNum, amount, ccyCode);
 	}
+	
+	@GetMapping("/findaccount/{accountNum}")
+	public Account getAccountDetails(@PathVariable Integer accountNum) {
+		return accountService.getAccountDetails(accountNum);
+	}
 }
