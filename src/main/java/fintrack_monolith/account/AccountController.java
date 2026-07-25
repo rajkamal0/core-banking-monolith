@@ -3,6 +3,7 @@ package fintrack_monolith.account;
 import java.math.BigDecimal;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,33 +20,34 @@ public class AccountController {
 	@Autowired
 	AccountService accountService;
 	
-	@PostMapping("/add")
+	@PostMapping("/create")
 	public Account createAccount(@RequestBody Account accountDetails) {
 		return accountService.createAccount(accountDetails);
 	}
 	
-	@DeleteMapping("/delete/{accountNum}")
-	public String deleteAccount(@PathVariable Integer accountNum) {
-		return accountService.deleteAccount(accountNum);
+	@DeleteMapping("/close/{accountNum}")
+	public ResponseEntity<Void> closeAccount(@PathVariable Integer accountNum) {
+		accountService.closeAccount(accountNum);
+		return ResponseEntity.noContent().build();
 	}
 	
 	@GetMapping("checkbalance/{accountNum}")
-	public String fetchBalance(@PathVariable Integer accountNum) {
+	public BigDecimal fetchBalance(@PathVariable Integer accountNum) {
 		return accountService.fetchBalance(accountNum);
 	}
 	
 	@PutMapping("debit/{accountNum}")
-	public String debitBalance(@PathVariable Integer accountNum, BigDecimal amount, String ccyCode) {
-		return accountService.debitBalance(accountNum, amount, ccyCode);
+	public BigDecimal debitBalance(@PathVariable Integer accountNum, BigDecimal amount, String ccyCode) {
+		return accountService.debit(accountNum, amount, ccyCode);
 	}
 	
 	@PutMapping("credit/{accountNum}")
-	public String creditBalance(@PathVariable Integer accountNum, BigDecimal amount, String ccyCode) {
-		return accountService.creditBalance(accountNum, amount, ccyCode);
+	public BigDecimal creditBalance(@PathVariable Integer accountNum, BigDecimal amount, String ccyCode) {
+		return accountService.credit(accountNum, amount, ccyCode);
 	}
 	
-	@GetMapping("/findaccount/{accountNum}")
+	@GetMapping("/get/{accountNum}")
 	public Account getAccountDetails(@PathVariable Integer accountNum) {
-		return accountService.getAccountDetails(accountNum);
+		return accountService.getAccountById(accountNum);
 	}
 }

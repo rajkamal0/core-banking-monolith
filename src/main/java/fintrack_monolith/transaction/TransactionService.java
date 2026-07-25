@@ -56,7 +56,7 @@ public class TransactionService {
 		// transaction starts
 		generalLedgerService.debitAssetGL(transaction.getDebitAccount(), transaction.getAmount(), transaction.getCcyCode());
 		//debit done
-		accountService.creditBalance(transaction.getCreditAccount(), transaction.getAmount(), transaction.getCcyCode());
+		accountService.credit(transaction.getCreditAccount(), transaction.getAmount(), transaction.getCcyCode());
 		//credit done
 		
 		return saveTransaction(transaction.getDebitAccount(), transaction.getCreditAccount(),
@@ -66,7 +66,7 @@ public class TransactionService {
 	@Transactional
 	public Transaction withdrawl(Transaction transaction) {
 		
-		accountService.debitBalance(transaction.getDebitAccount(), transaction.getAmount(), transaction.getCcyCode());
+		accountService.debit(transaction.getDebitAccount(), transaction.getAmount(), transaction.getCcyCode());
 		generalLedgerService.creditAssetGL(transaction.getCreditAccount(), transaction.getAmount(), transaction.getCcyCode());
 		
 		return saveTransaction(transaction.getDebitAccount(), transaction.getCreditAccount(),
@@ -75,8 +75,8 @@ public class TransactionService {
 
 	@Transactional
 	public Transaction transfer(Transaction transaction) {
-		accountService.debitBalance(transaction.getDebitAccount(), transaction.getAmount(), transaction.getCcyCode());
-		accountService.creditBalance(transaction.getCreditAccount(), transaction.getAmount(), transaction.getCcyCode());
+		accountService.debit(transaction.getDebitAccount(), transaction.getAmount(), transaction.getCcyCode());
+		accountService.credit(transaction.getCreditAccount(), transaction.getAmount(), transaction.getCcyCode());
 		
 		return saveTransaction(transaction.getDebitAccount(), transaction.getCreditAccount(),
 				   transaction.getAmount(), 'T', transaction.getCcyCode());	
@@ -96,15 +96,15 @@ public class TransactionService {
 	    
 	    if (originalType == 'D') { 
 	        generalLedgerService.creditAssetGL(originalTransaction.getDebitAccount(), originalTransaction.getAmount(), originalTransaction.getCcyCode());
-	        accountService.debitBalance(originalTransaction.getCreditAccount(), originalTransaction.getAmount(), originalTransaction.getCcyCode());
+	        accountService.debit(originalTransaction.getCreditAccount(), originalTransaction.getAmount(), originalTransaction.getCcyCode());
 	        
 	    } else if (originalType == 'W') { 
-	        accountService.creditBalance(originalTransaction.getDebitAccount(), originalTransaction.getAmount(), originalTransaction.getCcyCode());
+	        accountService.credit(originalTransaction.getDebitAccount(), originalTransaction.getAmount(), originalTransaction.getCcyCode());
 	        generalLedgerService.debitAssetGL(originalTransaction.getCreditAccount(), originalTransaction.getAmount(), originalTransaction.getCcyCode());
 	        
 	    } else if (originalType == 'T') { 
-	        accountService.creditBalance(originalTransaction.getDebitAccount(), originalTransaction.getAmount(), originalTransaction.getCcyCode());
-	        accountService.debitBalance(originalTransaction.getCreditAccount(), originalTransaction.getAmount(), originalTransaction.getCcyCode());
+	        accountService.credit(originalTransaction.getDebitAccount(), originalTransaction.getAmount(), originalTransaction.getCcyCode());
+	        accountService.debit(originalTransaction.getCreditAccount(), originalTransaction.getAmount(), originalTransaction.getCcyCode());
 	    }
 	    
 		return saveTransaction(originalTransaction.getCreditAccount(), originalTransaction.getDebitAccount(),

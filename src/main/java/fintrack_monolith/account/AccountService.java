@@ -7,135 +7,166 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import fintrack_monolith.customer.Customer;
-import fintrack_monolith.customer.CustomerRepository;
+import fintrack_monolith.customer.CustomerService;
+import fintrack_monolith.exception.AccountInactiveException;
+import fintrack_monolith.exception.CurrencyMismatchException;
 import fintrack_monolith.exception.InsufficientFundsException;
+import fintrack_monolith.exception.KycNotVerifiedException;
 import fintrack_monolith.exception.ResourceNotFoundException;
 import lombok.extern.slf4j.Slf4j;
-
 
 @Slf4j
 @Service
 public class AccountService {
-	
+
 	private final AccountRepository accountRepository;
-	private final CustomerRepository customerRepository;
-	
-	public AccountService (AccountRepository accountRepository, CustomerRepository customerRepository) {
+	private final CustomerService customerService;
+
+	public AccountService(AccountRepository accountRepository, CustomerService customerService) {
 		this.accountRepository = accountRepository;
-		this.customerRepository = customerRepository;
+		this.customerService = customerService;
 	}
-	
-	private boolean validateAccount(Integer accountNum, String ccy) {
-		log.info("Inside validateAccount");
-		log.debug("Account Number: {}, Currency: {}", accountNum, ccy);
-		/*
-		Account acc = accountRepository.findById(accountNum).orElseThrow(
+
+	private Account findAccountEntity(Integer accountNum) {
+		log.info("Inside findAccountEntity for Account {}", accountNum);
+		return accountRepository.findById(accountNum).orElseThrow(
 				() -> new ResourceNotFoundException("Account not found with Account Number: " + accountNum));
-		*/
-		// instead of passing account number, pass account object entirely.
-		// isAccountValid - method name
-		// validation methods should not have DB operations. checks should rely on parameters
+	}
+
+	private void isAccountActive(Account account) {
+		log.info("Inside isAccountActive");
 		
-		if (acc.getAccountStatus() != 'A') {
-			log.warn("Account is not active");
-			return false;
+		String errorMessage;
+		switch(account.getAccountStatus()) {
+		case 'A':
+			errorMessage = null;
+			break;
+		case 'C':
+			errorMessage = "closed";
+			break;
+		case 'D':
+			errorMessage = "dormant";
+			break;
+		case 'H':
+			errorMessage = "on hold";
+			break;
+		case 'I':
+			errorMessage = "inactive";
+			break;
+		default:
+			errorMessage = "in invalid state";
 		}
-		if(!acc.getCcyCode().equals(ccy)) {
-			log.warn("Account currency and transaction currency are not same");
-			return false;
+		
+		if (errorMessage != null) {
+			throw new AccountInactiveException("Account " + account.getAccountNum() + " is " + errorMessage);
 		}
-		log.info("returning from validateAccount");
-		return true;
+		
+		log.info("Account {} is active", account.getAccountNum());
+		log.info("returning from isAccountActive");
 	}
 	
+	private void validateCurrencyMatch(Integer accountNum, String accountCcy, String transactionCcy) {
+		log.info("Inside validateCurrencyMatch");
+		if(accountCcy != transactionCcy) {
+			log.warn("CURRENCY MISMATCH");
+			// log.warn("Account {}'s currency - {} and Transaction currency - {}", accountNum, accountCcy, transactionCcy);
+			throw new CurrencyMismatchException("Account ccy is " + accountCcy + " and Transaction ccy is " + transactionCcy);
+		}
+		log.info("returning from validateCurrencyMatch");
+	}
+
+
 	@Transactional
 	public Account createAccount(Account accountDetails) {
-		
+
 		log.info("Inside createAccount");
-		log.debug("");
-		Customer customer = customerRepository.findById(accountDetails.getCustomerID()).orElseThrow(
-								() -> new ResourceNotFoundException("Account not found with Account Number: " + accountDetails.getAccountNum()));
+		Customer customer = customerService.getCustomerById(accountDetails.getCustomerId());
 		if (!customer.getKycStatus()) {
-			return null;
+			throw new KycNotVerifiedException("KYC verification pending for customer ID: " + customer.getCustId());
 		}
-		
+
 		accountDetails.setBalance(BigDecimal.ZERO);
 		accountDetails.setAccountStatus('A');
+		log.info("creating account for customer: {}", accountDetails.getCustomerId());
+		log.info("returning from createAccount");
 		return accountRepository.save(accountDetails);
 	}
 
-	
-	public String deleteAccount(Integer accountNum) {
-		Account acc = accountRepository.findById(accountNum).orElseThrow(
-				() -> new ResourceNotFoundException("Account not found with Account Number: " + accountNum));
+	public void closeAccount(Integer accountNum) {
 		
-		if (acc.getAccountStatus()=='A') {
-			acc.setAccountStatus('C');
-			return "Account " + accountNum + " deletion success";
-		}
+		log.info("Inside closeAccount");
+		Account acc = findAccountEntity(accountNum);
 		
-		return "Account " + accountNum + " deletion failed";
+		isAccountActive(acc);
+		acc.setAccountStatus('C');
+		accountRepository.save(acc);
+		log.info("Closed account {}", accountNum);
+		
+		log.info("returning from closeAccount");
 	}
 
-	public String fetchBalance(Integer accountNum) {
-		Account acc = accountRepository.findById(accountNum).orElseThrow(
-				() -> new ResourceNotFoundException("Account not found with Account Number: " + accountNum));
-		
-		if (acc != null && acc.getAccountNum() != null)
-			return "Balance in Account " + accountNum + " is " + acc.getBalance();
-		 return "Balance check failed for Account " + accountNum;
+	public BigDecimal fetchBalance(Integer accountNum) {
+		log.info("Inside fetchBalance");
+		BigDecimal accountBalance = findAccountEntity(accountNum).getBalance();
+		log.info("Account: {} balance is {}", accountNum, accountBalance);
+		log.info("returning from fetchBalance");
+		return accountBalance;
 	}
 
 	@Transactional(propagation = Propagation.MANDATORY)
-	public String debitBalance(Integer accountNum, BigDecimal amount, String ccyCode) {
+	public BigDecimal debit(Integer accountNum, BigDecimal amount, String transactionCcy) {
 		
-		if (!validateAccount(accountNum, ccyCode)) {
-			return "Account " + accountNum + " failed in validation";
-		}
+		log.info("Inside debit");
+
+		Account acc = findAccountEntity(accountNum);
 		
-		Account acc = accountRepository.findById(accountNum).orElseThrow(
-				() -> new ResourceNotFoundException("Account not found with Account Number: " + accountNum));
+		isAccountActive(acc);
+		validateCurrencyMatch(acc.getAccountNum(), acc.getCcyCode(), transactionCcy);
 		
 		BigDecimal currBalance = acc.getBalance();
+		log.info("Account " + accountNum + " - balance before debit " + currBalance);
+		
 		int comparison = currBalance.compareTo(amount);
-		
-		if (comparison<0) {
+		if (comparison < 0) {
 			throw new InsufficientFundsException("Account " + accountNum + " is not having sufficient funds");
-			// return "Account " + accountNum + " is not having sufficient funds";
 		}
-		
+
 		BigDecimal newBalance = currBalance.subtract(amount);
-		
 		acc.setBalance(newBalance);
 		accountRepository.save(acc);
+		log.info("Account " + accountNum + " - updated balance is " + newBalance);
 		
-		return "Debited Rs." + amount + " from the account: " + accountNum + "\nUpdated Balance is " + newBalance;
-		
+		log.info("returning from debit");
+		return newBalance;
+
 	}
-	
+
 	@Transactional(propagation = Propagation.MANDATORY)
-	public String creditBalance(Integer accountNum, BigDecimal amount, String ccyCode) {
+	public BigDecimal credit(Integer accountNum, BigDecimal amount, String transactionCcy) {
 		
-		if (!validateAccount(accountNum, ccyCode)) {
-			return "Account " + accountNum + " failed in validation";
-		}
-		
-		Account acc = accountRepository.findById(accountNum).orElseThrow(
-				() -> new ResourceNotFoundException("Account not found with Account Number: " + accountNum));
-		
+		log.info("Inside credit");
+
+		Account acc = findAccountEntity(accountNum);
+		isAccountActive(acc);
+		validateCurrencyMatch(acc.getAccountNum(), acc.getCcyCode(), transactionCcy);
+
 		BigDecimal currBalance = acc.getBalance();
+		log.info("Account " + accountNum + " - balance before credit " + currBalance);
 		BigDecimal newBalance = currBalance.add(amount);
-		
+
 		acc.setBalance(newBalance);
 		accountRepository.save(acc);
+		log.info("Account " + accountNum + " - updated balance is " + newBalance);
 		
-		return "Credited Rs." + amount + " to the account: " + accountNum + "\nUpdated Balance is " + newBalance;
-		
+		log.info("returning from credit");
+		return newBalance;
+
 	}
-	
-	public Account getAccountDetails (Integer accountNum) {		
-		return accountRepository.findById(accountNum).orElseThrow(
-				() -> new ResourceNotFoundException("Account " + accountNum + " not found"));
+
+	public Account getAccountById(Integer accountNum) {
+		log.info("Inside getAccountById");
+		return accountRepository.findById(accountNum)
+				.orElseThrow(() -> new ResourceNotFoundException("Account " + accountNum + " not found"));
 
 	}
 

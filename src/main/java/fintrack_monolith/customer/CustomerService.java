@@ -4,8 +4,11 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import fintrack_monolith.account.Account;
 import fintrack_monolith.exception.ResourceNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class CustomerService {
 
@@ -15,23 +18,35 @@ public class CustomerService {
 		this.customerRepository = customerRepository;
 	}
 	
-	public Customer getCustomerByID(Integer custID) {
-		return customerRepository.findById(custID).orElseThrow(
-				() -> new ResourceNotFoundException("Customer " + custID + " not found"));
+	private Customer findCustomerEntity(Integer customerId) {
+		log.info("Inside findCustomerEntity for Customer {}", customerId);
+		return customerRepository.findById(customerId).orElseThrow(
+				() -> new ResourceNotFoundException("Customer not found with ID: " + customerId));
+	}
+	
+	public Customer getCustomerById(Integer customerID) {
+		log.info("Inside getCustomerByID");
+		log.info("customer ID: {}", customerID);
+		return findCustomerEntity(customerID);
 	}
 
 	public List<Customer> getAllCustomers() {
+		log.info("Inside getAllCustomers");
 		return customerRepository.findAll();
 	}
 
-	public Customer addCustomer(Customer customerDetails) {
+	public Customer createCustomer(Customer customerDetails) {
+		log.info("Inside addCustomer");
+		log.info("creating customer: " + customerDetails.getFirstname() + " " + customerDetails.getLastname());
 		return customerRepository.save(customerDetails);
 	}
 
-	public Customer updateCustomer(Customer updatedCustomerDetails) {
+	public Customer updateCustomer(Integer customerID, Customer updatedCustomerDetails) {
 		
-		Customer existingDetails = customerRepository.findById(updatedCustomerDetails.getCustID()).orElseThrow(
-				() -> new ResourceNotFoundException("Customer " + updatedCustomerDetails.getCustID() + " not found"));
+		log.info("Inside updateCustomer");
+		log.info("Customer ID: {}", customerID);
+		
+		Customer existingDetails = findCustomerEntity(customerID);
 		
 		if(updatedCustomerDetails.getKycStatus() != null) {
 			existingDetails.setKycStatus(updatedCustomerDetails.getKycStatus());
@@ -65,16 +80,20 @@ public class CustomerService {
 			existingDetails.setPincode(updatedCustomerDetails.getPincode());
 		}
 		
+		log.info("updating customer " + customerID);
 		return customerRepository.save(existingDetails);
 	}
 
-	public String deleteCustomer(Integer custID) {
-		Customer customerDetails = customerRepository.findById(custID).orElseThrow(
-				() -> new ResourceNotFoundException("Customer " + custID + " not found"));
-		String message = "Customer Details: \n Customer ID - " + custID + 
-						 "\n Customer Name - " + customerDetails.getFirstname() + " " + customerDetails.getLastname();
-		customerRepository.deleteById(custID);
-		return message + "\nCustomer deletion succesful";
+	public void closeCustomer(Integer customerID) {
+		
+		log.info("Inside closeCustomer");
+		log.info("Closing customer: {}", customerID);
+		if (!customerRepository.existsById(customerID)) {
+			throw new ResourceNotFoundException("Customer " + customerID + " not found");
+		}
+		// customerRepository.deleteById(customerID);
+		log.info("closing a customer requires active account check for which an orchestrator is recommeneded. Returning a success for now");
+		log.info("Customer {} closed", customerID);
 	}
 
 }

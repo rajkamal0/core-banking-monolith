@@ -36,7 +36,7 @@ public class Account {
 	private Character accountStatus;
 	
 	@Column(name="CUSTOMER_NO")
-	private Integer customerID;
+	private Integer customerId;
 	
 	@Column(name="CCY_CODE")
 	private String ccyCode;
