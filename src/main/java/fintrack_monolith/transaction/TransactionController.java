@@ -20,9 +20,9 @@ public class TransactionController {
 		return transactionService.deposit(transaction);
 	}
 	
-	@PostMapping("/withdrawl")
-	public Transaction withdrawl(@RequestBody Transaction transaction) {
-		return transactionService.withdrawl(transaction);
+	@PostMapping("/withdrawal")
+	public Transaction withdrawal(@RequestBody Transaction transaction) {
+		return transactionService.withdrawal(transaction);
 	}
 	
 	@PostMapping("/transfer")
@@ -35,9 +35,9 @@ public class TransactionController {
 		return transactionService.reversal(transactionID);
 	}
 	
-	@GetMapping("/findtransaction/{transactionID}")
-	public Transaction getTransaction (@PathVariable Integer transactionID) {
-		return transactionService.getTransaction(transactionID);
+	@GetMapping("/get/{transactionID}")
+	public Transaction getTransactionById (@PathVariable Integer transactionID) {
+		return transactionService.getTransactionById(transactionID);
 	}
 	
 }

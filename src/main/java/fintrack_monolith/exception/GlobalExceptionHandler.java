@@ -85,4 +85,28 @@ public class GlobalExceptionHandler {
 		log.warn("returning from handleCurrencyMismatchException");
 		return new ResponseEntity<ErrorDetails>(errorDetails, HttpStatus.BAD_REQUEST);
 	}
+	
+	@ExceptionHandler(CannotReverseTransactionException.class)
+	public ResponseEntity<ErrorDetails> handleCannotReverseTransactionException(CannotReverseTransactionException ex){
+		log.info("Inside handleCannotReverseTransactionException");
+		log.warn("CannotReverseTransactionException: {}", ex.getMessage());
+		ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(), 
+													 HttpStatus.UNPROCESSABLE_CONTENT.value(),
+													 "CANNOT_PROCESS_TRANSACTION",
+													 ex.getMessage());
+		log.warn("returning from handleCannotReverseTransactionException");
+		return new ResponseEntity<ErrorDetails>(errorDetails, HttpStatus.UNPROCESSABLE_CONTENT);
+	}
+	
+	@ExceptionHandler(IncorrectTransactionTypeException.class)
+	public ResponseEntity<ErrorDetails> handleIncorrectTransactionTypeException(IncorrectTransactionTypeException ex){
+		log.info("Inside handleCurrencyMismatchException");
+		log.warn("IncorrectTransactionTypeException: {}", ex.getMessage());
+		ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(), 
+													 HttpStatus.BAD_REQUEST.value(),
+													 "INCORRECT_TXN_TYPE",
+													 ex.getMessage());
+		log.warn("returning from handleIncorrectTransactionTypeException");
+		return new ResponseEntity<ErrorDetails>(errorDetails, HttpStatus.BAD_REQUEST);
+	}
 }

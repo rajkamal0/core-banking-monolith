@@ -181,6 +181,7 @@ log.info("Inside creditLiabilityGL");
 		log.info("returning from closeGl");
 	}
 	
+	@Transactional(readOnly = true)
 	public GeneralLedger getGlById (Integer glNum) {	
 		log.info("Inside getGlById");
 		return findGlEntity(glNum);

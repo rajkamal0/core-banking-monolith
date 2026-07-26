@@ -164,6 +164,7 @@ public class AccountService {
 
 	}
 
+	@Transactional(readOnly = true)
 	public Account getAccountById(Integer accountNum) {
 		log.info("Inside getAccountById");
 		return findAccountEntity(accountNum);

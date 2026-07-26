@@ -3,8 +3,8 @@ package fintrack_monolith.customer;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import fintrack_monolith.account.Account;
 import fintrack_monolith.exception.ResourceNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,6 +24,7 @@ public class CustomerService {
 				() -> new ResourceNotFoundException("Customer not found with ID: " + customerId));
 	}
 	
+	@Transactional(readOnly = true)
 	public Customer getCustomerById(Integer customerID) {
 		log.info("Inside getCustomerByID");
 		log.info("customer ID: {}", customerID);
