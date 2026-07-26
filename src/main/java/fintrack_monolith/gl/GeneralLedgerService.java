@@ -6,12 +6,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import fintrack_monolith.account.Account;
+import fintrack_monolith.exception.CurrencyMismatchException;
+import fintrack_monolith.exception.GlInactiveException;
 import fintrack_monolith.exception.InsufficientFundsException;
 import fintrack_monolith.exception.ResourceNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 
-//Credit & Debit GL methods are written considering only Cash GL (Asset GL) is maintained
-
+@Slf4j
 @Service
 public class GeneralLedgerService {
 	
@@ -21,56 +22,72 @@ public class GeneralLedgerService {
 		this.generalLedgerRepository = generalLedgerRepository;
 	}
 	
-	private boolean validateGL(Integer glNum, String ccy) {
-		GeneralLedger gl = generalLedgerRepository.findById(glNum).orElseThrow(
-				() -> new ResourceNotFoundException("GL " + glNum + " not found"));
+	private GeneralLedger findGlEntity(Integer glNum) {
+		log.info("Inside findGlEntity for GL {}", glNum);
+		return generalLedgerRepository.findById(glNum).orElseThrow(
+				() -> new ResourceNotFoundException("GL not found with GL Number: " + glNum));
+	}
+	
+	private void isGlActive(GeneralLedger generalLedger) {
+		log.info("Inside isGlActive");
 		
-		if (gl.getGlStatus() != 'A') {
-			return false;
+		if(generalLedger.getGlStatus()!='A') {
+			throw new GlInactiveException("GL " + generalLedger.getGlNum() + " is invalid");
 		}
-		if(!gl.getCcyCode().equals(ccy)) {
-			return false;
+		
+		log.info("General Ledger {} is active", generalLedger.getGlNum());
+		log.info("returning from isGlActive");
+	}
+	
+	private void validateCurrencyMatch(Integer glNum, String glCcy, String transactionCcy) {
+		log.info("Inside validateCurrencyMatch");
+		if(glCcy != transactionCcy) {
+			log.warn("CURRENCY MISMATCH");
+			throw new CurrencyMismatchException("General Ledger ccy is " + glCcy + " and Transaction ccy is " + transactionCcy);
 		}
-		return true;
+		
+		log.info("returning from validateCurrencyMatch");
 	}
 	 
 	
 	@Transactional(propagation = Propagation.MANDATORY)
-	public String debitAssetGL(Integer glNum, BigDecimal amount, String ccyCode) {
+	public BigDecimal debitAssetGL(Integer glNum, BigDecimal amount, String transactionCcy) {
 		
-		if (!validateGL(glNum, ccyCode)) {
-			return null;
-		}
+		log.info("Inside debitAssetGL");
 		
-		GeneralLedger gl = generalLedgerRepository.findById(glNum).orElseThrow(
-				() -> new ResourceNotFoundException("GL " + glNum + " not found"));
+		GeneralLedger gl = findGlEntity(glNum);
+		isGlActive(gl);
+		validateCurrencyMatch(glNum, gl.getCcyCode(), transactionCcy);
 		
 		BigDecimal currBalance = gl.getBalance();
+		log.info("GL " + glNum + " - balance before debit " + currBalance);
+		
 		BigDecimal newBalance = currBalance.add(amount);
 		
 		gl.setBalance(newBalance);
 		generalLedgerRepository.save(gl);
 		
-		return "Debited Rs." + amount + " to the Asset GL: " + glNum + "\nUpdated Balance is " + newBalance;
+		log.info("returning from debit");
+		return newBalance;
 		
 	}
 	
 	@Transactional(propagation = Propagation.MANDATORY)
-	public String creditAssetGL(Integer glNum, BigDecimal amount, String ccyCode) {
+	public BigDecimal creditAssetGL(Integer glNum, BigDecimal amount, String transactionCcy) {
 		
-		if (!validateGL(glNum, ccyCode)) {
-			return null;
-		}
+		log.info("Inside creditAssetGL");
 		
-		GeneralLedger gl = generalLedgerRepository.findById(glNum).orElseThrow(
-				() -> new ResourceNotFoundException("GL " + glNum + " not found"));
+		GeneralLedger gl = findGlEntity(glNum);
+		isGlActive(gl);
+		validateCurrencyMatch(glNum, gl.getCcyCode(), transactionCcy);
 		
 		BigDecimal currBalance = gl.getBalance();
+		log.info("GL " + glNum + " - balance before credit " + currBalance);
+		
 		int comparison = currBalance.compareTo(amount);
 		
 		if (comparison<0) {
 			throw new InsufficientFundsException("Asset GL " + glNum + " is not having sufficient funds");
-			// return "Asset GL " + glNum + " is not having sufficient funds";
 		}
 		
 		BigDecimal newBalance = currBalance.subtract(amount);
@@ -78,45 +95,49 @@ public class GeneralLedgerService {
 		gl.setBalance(newBalance);
 		generalLedgerRepository.save(gl);
 		
-		return "Credited Rs." + amount + " from the Asset GL: " + glNum + "\nUpdated Balance is " + newBalance;
+		log.info("returning from credit");
+		return newBalance;
+		
 	}
 	
 	@Transactional(propagation = Propagation.MANDATORY)
-	public String creditLiabilityGL(Integer glNum, BigDecimal amount, String ccyCode) {
+	public BigDecimal creditLiabilityGL(Integer glNum, BigDecimal amount, String transactionCcy) {
 		
-		if (!validateGL(glNum, ccyCode)) {
-			return null;
-		}
+log.info("Inside creditLiabilityGL");
 		
-		GeneralLedger gl = generalLedgerRepository.findById(glNum).orElseThrow(
-				() -> new ResourceNotFoundException("GL " + glNum + " not found"));
+		GeneralLedger gl = findGlEntity(glNum);
+		isGlActive(gl);
+		validateCurrencyMatch(glNum, gl.getCcyCode(), transactionCcy);
 		
 		BigDecimal currBalance = gl.getBalance();
+		log.info("GL " + glNum + " - balance before credit " + currBalance);
+		
 		BigDecimal newBalance = currBalance.add(amount);
 		
 		gl.setBalance(newBalance);
 		generalLedgerRepository.save(gl);
 		
-		return "Debited Rs." + amount + " to the Liability GL: " + glNum + "\nUpdated Balance is " + newBalance;
+		log.info("returning from credit");
+		return newBalance;
 		
 	}
 	
 	@Transactional(propagation = Propagation.MANDATORY)
-	public String debitLiabilityGL(Integer glNum, BigDecimal amount, String ccyCode) {
+	public BigDecimal debitLiabilityGL(Integer glNum, BigDecimal amount, String transactionCcy) {
 		
-		if (!validateGL(glNum, ccyCode)) {
-			return null;
-		}
+		log.info("Inside debitLiabilityGL");
 		
-		GeneralLedger gl = generalLedgerRepository.findById(glNum).orElseThrow(
-				() -> new ResourceNotFoundException("GL " + glNum + " not found"));
+		GeneralLedger gl = findGlEntity(glNum);
+		isGlActive(gl);
+		validateCurrencyMatch(glNum, gl.getCcyCode(), transactionCcy);
 		
 		BigDecimal currBalance = gl.getBalance();
+		log.info("GL " + glNum + " - balance before debit " + currBalance);
+		
 		int comparison = currBalance.compareTo(amount);
 		
 		if (comparison<0) {
 			throw new InsufficientFundsException("Liability GL " + glNum + " is not having sufficient funds");
-			// return "Liability GL " + glNum + " is not having sufficient funds";
 		}
 		
 		BigDecimal newBalance = currBalance.subtract(amount);
@@ -124,42 +145,45 @@ public class GeneralLedgerService {
 		gl.setBalance(newBalance);
 		generalLedgerRepository.save(gl);
 		
-		return "Credited Rs." + amount + " from the Liability GL: " + glNum + "\nUpdated Balance is " + newBalance;
+		log.info("returning from debit");
+		return newBalance;
+		
 	}
 	
-	public String fetchBalance(Integer glNum) {
-		GeneralLedger gl = generalLedgerRepository.findById(glNum).orElseThrow(
-				() -> new ResourceNotFoundException("GL " + glNum + " not found"));
-		
-		if (gl != null && gl.getGlNum() != null)
-			return "Balance in GL " + glNum + " is " + gl.getBalance();
-		return "Balance check failed for GL " + glNum;
+	public BigDecimal fetchBalance(Integer glNum) {
+		log.info("Inside fetchBalance");
+		BigDecimal glBalance = findGlEntity(glNum).getBalance();
+		log.info("GL: {} balance is {}", glNum, glBalance);
+		log.info("returning from fetchBalance");
+		return glBalance;
 	}
 	
 	@Transactional
-	public GeneralLedger createGL(GeneralLedger GLDetails) {
+	public GeneralLedger createGl(GeneralLedger GLDetails) {
 		
+		log.info("Inside createGL");
 		GLDetails.setBalance(BigDecimal.ZERO);
 		GLDetails.setGlStatus('A');
+		log.info("returning from createGL");
 		return generalLedgerRepository.save(GLDetails);
 	}
 
 	
-	public String deleteGL(Integer glNum) {
-		GeneralLedger gl = generalLedgerRepository.findById(glNum).orElseThrow(
-				() -> new ResourceNotFoundException("GL " + glNum + " not found"));
+	public void closeGl(Integer glNum) {
+		log.info("Inside closeGl");
+		GeneralLedger gl = findGlEntity(glNum);
 		
-		if (gl.getGlStatus()=='A') {
-			gl.setGlStatus('C');
-			return "GL " + glNum + " deletion success";
-		}
+		isGlActive(gl);
+		gl.setGlStatus('C');
+		generalLedgerRepository.save(gl);
+		log.info("Closed GL {}", glNum);
 		
-		return "GL " + glNum + " deletion failed";
+		log.info("returning from closeGl");
 	}
 	
-	public GeneralLedger getGLDetails (Integer glNum) {		
-		return generalLedgerRepository.findById(glNum).orElseThrow(
-				() -> new ResourceNotFoundException("GL " + glNum + " not found"));
+	public GeneralLedger getGlById (Integer glNum) {	
+		log.info("Inside getGlById");
+		return findGlEntity(glNum);
 
 	}
 

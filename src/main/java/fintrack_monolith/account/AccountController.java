@@ -31,17 +31,17 @@ public class AccountController {
 		return ResponseEntity.noContent().build();
 	}
 	
-	@GetMapping("checkbalance/{accountNum}")
+	@GetMapping("/checkbalance/{accountNum}")
 	public BigDecimal fetchBalance(@PathVariable Integer accountNum) {
 		return accountService.fetchBalance(accountNum);
 	}
 	
-	@PutMapping("debit/{accountNum}")
+	@PutMapping("/debit/{accountNum}")
 	public BigDecimal debitBalance(@PathVariable Integer accountNum, BigDecimal amount, String ccyCode) {
 		return accountService.debit(accountNum, amount, ccyCode);
 	}
 	
-	@PutMapping("credit/{accountNum}")
+	@PutMapping("/credit/{accountNum}")
 	public BigDecimal creditBalance(@PathVariable Integer accountNum, BigDecimal amount, String ccyCode) {
 		return accountService.credit(accountNum, amount, ccyCode);
 	}

@@ -72,6 +72,7 @@ public class AccountService {
 			// log.warn("Account {}'s currency - {} and Transaction currency - {}", accountNum, accountCcy, transactionCcy);
 			throw new CurrencyMismatchException("Account ccy is " + accountCcy + " and Transaction ccy is " + transactionCcy);
 		}
+		
 		log.info("returning from validateCurrencyMatch");
 	}
 
@@ -121,7 +122,7 @@ public class AccountService {
 		Account acc = findAccountEntity(accountNum);
 		
 		isAccountActive(acc);
-		validateCurrencyMatch(acc.getAccountNum(), acc.getCcyCode(), transactionCcy);
+		validateCurrencyMatch(accountNum, acc.getCcyCode(), transactionCcy);
 		
 		BigDecimal currBalance = acc.getBalance();
 		log.info("Account " + accountNum + " - balance before debit " + currBalance);
@@ -165,8 +166,7 @@ public class AccountService {
 
 	public Account getAccountById(Integer accountNum) {
 		log.info("Inside getAccountById");
-		return accountRepository.findById(accountNum)
-				.orElseThrow(() -> new ResourceNotFoundException("Account " + accountNum + " not found"));
+		return findAccountEntity(accountNum);
 
 	}
 

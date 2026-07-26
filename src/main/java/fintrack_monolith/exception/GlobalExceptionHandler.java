@@ -62,10 +62,10 @@ public class GlobalExceptionHandler {
 		return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
 	}
 	
-	@ExceptionHandler(AccountInactiveException.class)
-	public ResponseEntity<ErrorDetails> handleAccountInactiveException(AccountInactiveException ex){
+	@ExceptionHandler({AccountInactiveException.class, GlInactiveException.class})
+	public ResponseEntity<ErrorDetails> handleAccountInactiveException(RuntimeException ex){
 		log.info("Inside handleAccountInactiveException");
-		log.warn("AccountInactiveException: {}", ex.getMessage());
+		log.warn("AccountInactiveException or GlInactiveException: {}", ex.getMessage());
 		ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(), 
 													 HttpStatus.UNPROCESSABLE_CONTENT.value(),
 													 "ACCOUNT_IS_NOT_ACTIVE",
