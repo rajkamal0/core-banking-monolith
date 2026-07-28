@@ -43,8 +43,8 @@ public class TransactionService {
 		log.info("Inside saveTransaction");
 		Transaction tx = new Transaction();
 		
-		Integer nextTxnSeq = transactionRepository.getNextAccountSequence();
-		tx.assignTxnId(nextTxnSeq);
+//		Integer nextTxnSeq = transactionRepository.getNextAccountSequence();
+//		tx.assignTxnId(nextTxnSeq);
 		tx.setDebitAccount(debitAcc);
 		tx.setCreditAccount(creditAcc);
 		tx.setAmount(amount);

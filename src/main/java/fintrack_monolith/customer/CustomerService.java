@@ -38,8 +38,8 @@ public class CustomerService {
 
 	public Customer createCustomer(Customer customerDetails) {
 		log.info("Inside addCustomer");
-		Integer nextCustSeq = customerRepository.findNextCustomerSequence();
-		customerDetails.assignCustId(nextCustSeq);
+//		Integer nextCustSeq = customerRepository.findNextCustomerSequence();
+//		customerDetails.assignCustId(nextCustSeq);
 		log.info("creating customer: " + customerDetails.getFirstname() + " " + customerDetails.getLastname());
 		
 		return customerRepository.save(customerDetails);

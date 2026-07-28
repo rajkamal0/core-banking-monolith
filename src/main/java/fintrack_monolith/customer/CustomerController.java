@@ -40,7 +40,7 @@ public class CustomerController {
 		return customerService.updateCustomer(customerID, customerDetails);
 	}
 	
-	@DeleteMapping("/close/{customerID}")
+	@PutMapping("/close/{customerID}")
 	public ResponseEntity<Void> closeCustomer(@PathVariable String customerID) {
 		customerService.closeCustomer(customerID);
 		return ResponseEntity.noContent().build();

@@ -90,8 +90,8 @@ public class AccountService {
 		accountDetails.setAccountStatus('A');
 		log.info("creating account for customer: {}", accountDetails.getCustomerId());
 		log.info("returning from createAccount");
-		Integer nextAccSeq = accountRepository.findNextAccountSequence();
-		accountDetails.assignAccountNum(nextAccSeq);
+//		Integer nextAccSeq = accountRepository.findNextAccountSequence();
+//		accountDetails.assignAccountNum(nextAccSeq);
 		return accountRepository.save(accountDetails);
 	}
 

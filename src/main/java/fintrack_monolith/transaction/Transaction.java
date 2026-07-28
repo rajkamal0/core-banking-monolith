@@ -51,9 +51,12 @@ public class Transaction {
 	@Column(name="TXN_TIME")
 	private LocalDateTime txnTime;
 	
-	public void assignTxnId(Integer txnSeqValue) {
-        this.id = txnSeqValue;
-        this.txnID = String.format("T%07d", txnSeqValue);
+	public void assignTxnId() {
+//        this.id = txnSeqValue;
+		if(this.id != null) {
+			this.txnID = String.format("T%07d", this.id);
+		}
+        
     }
 
 }

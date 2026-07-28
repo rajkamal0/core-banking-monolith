@@ -10,6 +10,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
@@ -57,9 +58,13 @@ public class Account {
 	private Integer version;
 	
 	// for generating account number
-	public void assignAccountNum(Integer accSeqValue) {
-        this.id = accSeqValue;
-        this.accountNum = String.format("A%07d", accSeqValue);
+	@PrePersist
+	public void assignAccountNum() {
+//        this.id = accSeqValue;
+		if(this.id != null) {
+			this.accountNum = String.format("A%07d", this.id);
+		}
+        
     }
 	
 }

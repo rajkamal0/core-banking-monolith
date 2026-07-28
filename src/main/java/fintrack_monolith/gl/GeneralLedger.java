@@ -53,9 +53,12 @@ public class GeneralLedger {
 	@Column(name="VERSION")
 	private Integer version;
 	
-	public void assignGlNum(Integer glSeqValue) {
-        this.id = glSeqValue;
-        this.glNum = String.format("G%07d", glSeqValue);
+	public void assignGlNum() {
+//        this.id = glSeqValue;
+		if(this.id != null) {
+			this.glNum = String.format("G%07d", this.id);
+		}
+        
     }
 
 }

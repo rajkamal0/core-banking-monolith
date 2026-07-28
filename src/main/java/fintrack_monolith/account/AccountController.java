@@ -25,7 +25,7 @@ public class AccountController {
 		return accountService.createAccount(accountDetails);
 	}
 	
-	@DeleteMapping("/close/{accountNum}")
+	@PutMapping("/close/{accountNum}")
 	public ResponseEntity<Void> closeAccount(@PathVariable String accountNum) {
 		accountService.closeAccount(accountNum);
 		return ResponseEntity.noContent().build();

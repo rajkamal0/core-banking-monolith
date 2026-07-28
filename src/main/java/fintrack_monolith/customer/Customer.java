@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -52,9 +53,13 @@ public class Customer {
 	private Boolean kycStatus;
 	
 	// for generating customer id
-	public void assignCustId(Integer custSeqValue) {
-        this.id = custSeqValue;
-        this.custId = String.format("C%07d", custSeqValue);
+	@PrePersist
+	public void assignCustId() {
+//        this.id = custSeqValue;
+		if(this.id != null) {
+			this.custId = String.format("C%07d", this.id);
+		}
+        
     }
 	
 }
