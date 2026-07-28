@@ -21,8 +21,8 @@ public class CustomerController {
 	CustomerService customerService;
 
 	@GetMapping("/get/{customerID}")
-	public Customer getCustomerById(@PathVariable Integer customerID) {
-		return customerService.getCustomerById(customerID);
+	public Customer getCustomerByCustId(@PathVariable String customerID) {
+		return customerService.getCustomerByCustId(customerID);
 	}
 	
 	@GetMapping("/get/all")
@@ -36,12 +36,12 @@ public class CustomerController {
 	}
 	
 	@PutMapping("/update/{customerID}")
-	public Customer updateCustomer(@PathVariable Integer customerID, @RequestBody Customer customerDetails) {
+	public Customer updateCustomer(@PathVariable String customerID, @RequestBody Customer customerDetails) {
 		return customerService.updateCustomer(customerID, customerDetails);
 	}
 	
 	@DeleteMapping("/close/{customerID}")
-	public ResponseEntity<Void> closeCustomer(@PathVariable Integer customerID) {
+	public ResponseEntity<Void> closeCustomer(@PathVariable String customerID) {
 		customerService.closeCustomer(customerID);
 		return ResponseEntity.noContent().build();
 	}

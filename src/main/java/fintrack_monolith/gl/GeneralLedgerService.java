@@ -22,9 +22,9 @@ public class GeneralLedgerService {
 		this.generalLedgerRepository = generalLedgerRepository;
 	}
 	
-	private GeneralLedger findGlEntity(Integer glNum) {
-		log.info("Inside findGlEntity for GL {}", glNum);
-		return generalLedgerRepository.findById(glNum).orElseThrow(
+	private GeneralLedger getGlEntity(String glNum) {
+		log.info("Inside getGlEntity for GL {}", glNum);
+		return generalLedgerRepository.findByGlNum(glNum).orElseThrow(
 				() -> new ResourceNotFoundException("GL not found with GL Number: " + glNum));
 	}
 	
@@ -39,11 +39,11 @@ public class GeneralLedgerService {
 		log.info("returning from isGlActive");
 	}
 	
-	private void validateCurrencyMatch(Integer glNum, String glCcy, String transactionCcy) {
+	private void validateCurrencyMatch(String glNum, String glCcy, String transactionCcy) {
 		log.info("Inside validateCurrencyMatch");
 		if(glCcy != transactionCcy) {
 			log.warn("CURRENCY MISMATCH");
-			throw new CurrencyMismatchException("General Ledger ccy is " + glCcy + " and Transaction ccy is " + transactionCcy);
+			throw new CurrencyMismatchException("General Ledger " + glNum + " ccy is " + glCcy + " and Transaction ccy is " + transactionCcy);
 		}
 		
 		log.info("returning from validateCurrencyMatch");
@@ -51,11 +51,11 @@ public class GeneralLedgerService {
 	 
 	
 	@Transactional(propagation = Propagation.MANDATORY)
-	public BigDecimal debitAssetGL(Integer glNum, BigDecimal amount, String transactionCcy) {
+	public BigDecimal debitAssetGL(String glNum, BigDecimal amount, String transactionCcy) {
 		
 		log.info("Inside debitAssetGL");
 		
-		GeneralLedger gl = findGlEntity(glNum);
+		GeneralLedger gl = getGlEntity(glNum);
 		isGlActive(gl);
 		validateCurrencyMatch(glNum, gl.getCcyCode(), transactionCcy);
 		
@@ -73,11 +73,11 @@ public class GeneralLedgerService {
 	}
 	
 	@Transactional(propagation = Propagation.MANDATORY)
-	public BigDecimal creditAssetGL(Integer glNum, BigDecimal amount, String transactionCcy) {
+	public BigDecimal creditAssetGL(String glNum, BigDecimal amount, String transactionCcy) {
 		
 		log.info("Inside creditAssetGL");
 		
-		GeneralLedger gl = findGlEntity(glNum);
+		GeneralLedger gl = getGlEntity(glNum);
 		isGlActive(gl);
 		validateCurrencyMatch(glNum, gl.getCcyCode(), transactionCcy);
 		
@@ -101,11 +101,11 @@ public class GeneralLedgerService {
 	}
 	
 	@Transactional(propagation = Propagation.MANDATORY)
-	public BigDecimal creditLiabilityGL(Integer glNum, BigDecimal amount, String transactionCcy) {
+	public BigDecimal creditLiabilityGL(String glNum, BigDecimal amount, String transactionCcy) {
 		
 log.info("Inside creditLiabilityGL");
 		
-		GeneralLedger gl = findGlEntity(glNum);
+		GeneralLedger gl = getGlEntity(glNum);
 		isGlActive(gl);
 		validateCurrencyMatch(glNum, gl.getCcyCode(), transactionCcy);
 		
@@ -123,11 +123,11 @@ log.info("Inside creditLiabilityGL");
 	}
 	
 	@Transactional(propagation = Propagation.MANDATORY)
-	public BigDecimal debitLiabilityGL(Integer glNum, BigDecimal amount, String transactionCcy) {
+	public BigDecimal debitLiabilityGL(String glNum, BigDecimal amount, String transactionCcy) {
 		
 		log.info("Inside debitLiabilityGL");
 		
-		GeneralLedger gl = findGlEntity(glNum);
+		GeneralLedger gl = getGlEntity(glNum);
 		isGlActive(gl);
 		validateCurrencyMatch(glNum, gl.getCcyCode(), transactionCcy);
 		
@@ -150,9 +150,9 @@ log.info("Inside creditLiabilityGL");
 		
 	}
 	
-	public BigDecimal fetchBalance(Integer glNum) {
+	public BigDecimal fetchBalance(String glNum) {
 		log.info("Inside fetchBalance");
-		BigDecimal glBalance = findGlEntity(glNum).getBalance();
+		BigDecimal glBalance = getGlEntity(glNum).getBalance();
 		log.info("GL: {} balance is {}", glNum, glBalance);
 		log.info("returning from fetchBalance");
 		return glBalance;
@@ -169,9 +169,9 @@ log.info("Inside creditLiabilityGL");
 	}
 
 	
-	public void closeGl(Integer glNum) {
+	public void closeGl(String glNum) {
 		log.info("Inside closeGl");
-		GeneralLedger gl = findGlEntity(glNum);
+		GeneralLedger gl = getGlEntity(glNum);
 		
 		isGlActive(gl);
 		gl.setGlStatus('C');
@@ -182,9 +182,9 @@ log.info("Inside creditLiabilityGL");
 	}
 	
 	@Transactional(readOnly = true)
-	public GeneralLedger getGlById (Integer glNum) {	
-		log.info("Inside getGlById");
-		return findGlEntity(glNum);
+	public GeneralLedger getGlByGlNum (String glNum) {	
+		log.info("Inside getGlByGlNum");
+		return getGlEntity(glNum);
 
 	}
 

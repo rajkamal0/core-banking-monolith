@@ -2,7 +2,10 @@ package fintrack_monolith.customer;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,8 +19,13 @@ import lombok.NoArgsConstructor;
 public class Customer {
 	
 	@Id
-	@Column(name="CUSTOMER_ID")
-	private Integer custId;
+	@Column(name="ID")
+	@GeneratedValue(generator = "c_seq_generator", strategy = GenerationType.SEQUENCE)
+	@SequenceGenerator(name = "c_seq_generator", sequenceName = "SEQ_CUSTOMER", initialValue = 1, allocationSize = 1)
+	private Integer id;
+	
+	@Column(name="CUSTOMER_ID", unique = true, nullable = false)
+	private String custId;
 	
 	@Column(name="FIRST_NAME")
 	private String firstname;
@@ -42,5 +50,11 @@ public class Customer {
 	
 	@Column(name="KYC_STATUS")
 	private Boolean kycStatus;
+	
+	// for generating customer id
+	public void assignCustId(Integer custSeqValue) {
+        this.id = custSeqValue;
+        this.custId = String.format("C%07d", custSeqValue);
+    }
 	
 }

@@ -1,0 +1,97 @@
+2026-07-28 23:40:57.208 INFO  [main] f.FintrackMonolithApplication - Starting FintrackMonolithApplication using Java 23.0.1 with PID 27736 (D:\RKFiles\FINTRACK\core-banking-monolith\target\classes started by Rajkamal in D:\RKFiles\FINTRACK\core-banking-monolith)
+2026-07-28 23:40:57.213 INFO  [main] f.FintrackMonolithApplication - No active profile set, falling back to 1 default profile: "default"
+2026-07-28 23:40:58.022 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-07-28 23:40:58.083 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 50 ms. Found 4 JPA repository interfaces.
+2026-07-28 23:40:59.016 INFO  [main] org.hibernate.orm.jpa - HHH008540: Processing PersistenceUnitInfo [name: AotMetamodel]
+2026-07-28 23:40:59.097 INFO  [main] org.hibernate.orm.core - HHH000001: Hibernate ORM core version 7.4.1.Final
+2026-07-28 23:40:59.652 INFO  [main] o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-07-28 23:40:59.684 INFO  [main] o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [undefined/unknown]
+	Database driver: undefined/unknown
+	Database dialect: SpringDataJpaAotDialect
+	Database version: 0.0
+	Default catalog/schema: unknown/unknown
+	Autocommit mode: undefined/unknown
+	Isolation level: <unknown>
+	JDBC fetch size: undefined/unknown
+	Pool: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-07-28 23:41:00.552 INFO  [main] org.hibernate.orm.core - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-07-28 23:41:01.069 INFO  [main] o.s.d.j.r.q.QueryEnhancerFactories - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-07-28 23:41:01.084 ERROR [main] o.s.d.r.a.g.AotRepositoryCreator - Failed to contribute Repository method [fintrack_monolith.customer.CustomerRepository.findByCustomerId(java.lang.String)]
+org.springframework.data.core.PropertyReferenceException: No property 'customerId' found for type 'Customer'
+	at org.springframework.data.core.SimplePropertyPath.<init>(SimplePropertyPath.java:94)
+	at org.springframework.data.core.SimplePropertyPath.create(SimplePropertyPath.java:322)
+	at org.springframework.data.core.SimplePropertyPath.create(SimplePropertyPath.java:297)
+	at org.springframework.data.core.SimplePropertyPath.lambda$from$0(SimplePropertyPath.java:250)
+	at org.springframework.util.ConcurrentReferenceHashMap$6.execute(ConcurrentReferenceHashMap.java:387)
+	at org.springframework.util.ConcurrentReferenceHashMap$Segment.doTask(ConcurrentReferenceHashMap.java:688)
+	at org.springframework.util.ConcurrentReferenceHashMap.doTask(ConcurrentReferenceHashMap.java:572)
+	at org.springframework.util.ConcurrentReferenceHashMap.computeIfAbsent(ConcurrentReferenceHashMap.java:381)
+	at org.springframework.data.core.SimplePropertyPath.from(SimplePropertyPath.java:228)
+	at org.springframework.data.core.PropertyPath.from(PropertyPath.java:264)
+	at org.springframework.data.core.PropertyPath.from(PropertyPath.java:247)
+	at org.springframework.data.repository.query.parser.Part.<init>(Part.java:81)
+	at org.springframework.data.repository.query.parser.PartTree$OrPart.lambda$new$0(PartTree.java:260)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:215)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Spliterators$ArraySpliterator.forEachRemaining(Spliterators.java:1024)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:570)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:560)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(ReduceOps.java:921)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:265)
+	at java.base/java.util.stream.ReferencePipeline.collect(ReferencePipeline.java:727)
+	at org.springframework.data.repository.query.parser.PartTree$OrPart.<init>(PartTree.java:261)
+	at org.springframework.data.repository.query.parser.PartTree$Predicate.lambda$new$0(PartTree.java:390)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:215)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.Spliterators$ArraySpliterator.forEachRemaining(Spliterators.java:1024)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:570)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:560)
+	at java.base/java.util.stream.ReduceOps$ReduceOp.evaluateSequential(ReduceOps.java:921)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:265)
+	at java.base/java.util.stream.ReferencePipeline.collect(ReferencePipeline.java:727)
+	at org.springframework.data.repository.query.parser.PartTree$Predicate.<init>(PartTree.java:391)
+	at org.springframework.data.repository.query.parser.PartTree.<init>(PartTree.java:104)
+	at org.springframework.data.jpa.repository.aot.QueriesFactory.buildPartTreeQuery(QueriesFactory.java:271)
+	at org.springframework.data.jpa.repository.aot.QueriesFactory.createQueries(QueriesFactory.java:136)
+	at org.springframework.data.jpa.repository.aot.JpaRepositoryContributor.contributeQueryMethod(JpaRepositoryContributor.java:197)
+	at org.springframework.data.repository.aot.generate.AotRepositoryCreator.contributeMethod(AotRepositoryCreator.java:292)
+	at org.springframework.data.repository.aot.generate.AotRepositoryCreator.lambda$contributeMethods$1(AotRepositoryCreator.java:238)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+	at java.base/java.util.stream.SortedOps$SizedRefSortingSink.end(SortedOps.java:357)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:571)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:560)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:265)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:636)
+	at org.springframework.data.repository.aot.generate.AotRepositoryCreator.contributeMethods(AotRepositoryCreator.java:235)
+	at org.springframework.data.repository.aot.generate.RepositoryContributor.contribute(RepositoryContributor.java:121)
+	at org.springframework.data.repository.config.RepositoryRegistrationAotContribution.applyTo(RepositoryRegistrationAotContribution.java:66)
+	at org.springframework.beans.factory.aot.BeanDefinitionMethodGenerator.lambda$generateBeanDefinitionMethod$0(BeanDefinitionMethodGenerator.java:165)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+	at org.springframework.beans.factory.aot.BeanDefinitionMethodGenerator.generateBeanDefinitionMethod(BeanDefinitionMethodGenerator.java:165)
+	at org.springframework.beans.factory.aot.BeanDefinitionMethodGenerator.generateBeanDefinitionMethod(BeanDefinitionMethodGenerator.java:89)
+	at org.springframework.beans.factory.aot.BeanRegistrationsAotContribution$BeanDefinitionsRegistrationGenerator.generateBeanRegistration(BeanRegistrationsAotContribution.java:289)
+	at org.springframework.beans.factory.aot.BeanRegistrationsAotContribution$BeanDefinitionsRegistrationGenerator.lambda$generateRegisterBeanDefinitionMethods$0(BeanRegistrationsAotContribution.java:272)
+	at java.base/java.lang.Iterable.forEach(Iterable.java:75)
+	at org.springframework.beans.factory.aot.BeanRegistrationsAotContribution$BeanDefinitionsRegistrationGenerator.generateRegisterBeanDefinitionMethods(BeanRegistrationsAotContribution.java:270)
+	at org.springframework.beans.factory.aot.BeanRegistrationsAotContribution$BeanDefinitionsRegistrationGenerator.generateBeanRegistrationsCode(BeanRegistrationsAotContribution.java:238)
+	at org.springframework.beans.factory.aot.BeanRegistrationsAotContribution.lambda$generateBeanRegistrationClass$0(BeanRegistrationsAotContribution.java:116)
+	at org.springframework.aot.generate.GeneratedMethod.<init>(GeneratedMethod.java:54)
+	at org.springframework.aot.generate.GeneratedMethods.add(GeneratedMethods.java:112)
+	at org.springframework.aot.generate.GeneratedMethods.add(GeneratedMethods.java:89)
+	at org.springframework.beans.factory.aot.BeanRegistrationsAotContribution.generateBeanRegistrationClass(BeanRegistrationsAotContribution.java:110)
+	at org.springframework.beans.factory.aot.BeanRegistrationsAotContribution.generateBeanRegistrationCode(BeanRegistrationsAotContribution.java:88)
+	at org.springframework.beans.factory.aot.BeanRegistrationsAotContribution.applyTo(BeanRegistrationsAotContribution.java:77)
+	at org.springframework.context.aot.BeanFactoryInitializationAotContributions.applyTo(BeanFactoryInitializationAotContributions.java:94)
+	at org.springframework.context.aot.ApplicationContextAotGenerator.lambda$processAheadOfTime$0(ApplicationContextAotGenerator.java:59)
+	at org.springframework.context.aot.ApplicationContextAotGenerator.withCglibClassHandler(ApplicationContextAotGenerator.java:68)
+	at org.springframework.context.aot.ApplicationContextAotGenerator.processAheadOfTime(ApplicationContextAotGenerator.java:54)
+	at org.springframework.context.aot.ContextAotProcessor.performAotProcessing(ContextAotProcessor.java:107)
+	at org.springframework.context.aot.ContextAotProcessor.doProcess(ContextAotProcessor.java:84)
+	at org.springframework.context.aot.ContextAotProcessor.doProcess(ContextAotProcessor.java:49)
+	at org.springframework.context.aot.AbstractAotProcessor.process(AbstractAotProcessor.java:84)
+	at org.springframework.boot.SpringApplicationAotProcessor.main(SpringApplicationAotProcessor.java:96)

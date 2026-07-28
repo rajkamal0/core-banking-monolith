@@ -27,9 +27,9 @@ public class AccountService {
 		this.customerService = customerService;
 	}
 
-	private Account findAccountEntity(Integer accountNum) {
-		log.info("Inside findAccountEntity for Account {}", accountNum);
-		return accountRepository.findById(accountNum).orElseThrow(
+	private Account getAccountEntity(String accountNum) {
+		log.info("Inside getAccountEntity for Account {}", accountNum);
+		return accountRepository.findByAccountNum(accountNum).orElseThrow(
 				() -> new ResourceNotFoundException("Account not found with Account Number: " + accountNum));
 	}
 
@@ -65,7 +65,7 @@ public class AccountService {
 		log.info("returning from isAccountActive");
 	}
 	
-	private void validateCurrencyMatch(Integer accountNum, String accountCcy, String transactionCcy) {
+	private void validateCurrencyMatch(String accountNum, String accountCcy, String transactionCcy) {
 		log.info("Inside validateCurrencyMatch");
 		if(accountCcy != transactionCcy) {
 			log.warn("CURRENCY MISMATCH");
@@ -81,7 +81,7 @@ public class AccountService {
 	public Account createAccount(Account accountDetails) {
 
 		log.info("Inside createAccount");
-		Customer customer = customerService.getCustomerById(accountDetails.getCustomerId());
+		Customer customer = customerService.getCustomerByCustId(accountDetails.getCustomerId());
 		if (!customer.getKycStatus()) {
 			throw new KycNotVerifiedException("KYC verification pending for customer ID: " + customer.getCustId());
 		}
@@ -93,10 +93,10 @@ public class AccountService {
 		return accountRepository.save(accountDetails);
 	}
 
-	public void closeAccount(Integer accountNum) {
+	public void closeAccount(String accountNum) {
 		
 		log.info("Inside closeAccount");
-		Account acc = findAccountEntity(accountNum);
+		Account acc = getAccountEntity(accountNum);
 		
 		isAccountActive(acc);
 		acc.setAccountStatus('C');
@@ -106,20 +106,20 @@ public class AccountService {
 		log.info("returning from closeAccount");
 	}
 
-	public BigDecimal fetchBalance(Integer accountNum) {
+	public BigDecimal fetchBalance(String accountNum) {
 		log.info("Inside fetchBalance");
-		BigDecimal accountBalance = findAccountEntity(accountNum).getBalance();
+		BigDecimal accountBalance = getAccountEntity(accountNum).getBalance();
 		log.info("Account: {} balance is {}", accountNum, accountBalance);
 		log.info("returning from fetchBalance");
 		return accountBalance;
 	}
 
 	@Transactional(propagation = Propagation.MANDATORY)
-	public BigDecimal debit(Integer accountNum, BigDecimal amount, String transactionCcy) {
+	public BigDecimal debit(String accountNum, BigDecimal amount, String transactionCcy) {
 		
 		log.info("Inside debit");
 
-		Account acc = findAccountEntity(accountNum);
+		Account acc = getAccountEntity(accountNum);
 		
 		isAccountActive(acc);
 		validateCurrencyMatch(accountNum, acc.getCcyCode(), transactionCcy);
@@ -143,11 +143,11 @@ public class AccountService {
 	}
 
 	@Transactional(propagation = Propagation.MANDATORY)
-	public BigDecimal credit(Integer accountNum, BigDecimal amount, String transactionCcy) {
+	public BigDecimal credit(String accountNum, BigDecimal amount, String transactionCcy) {
 		
 		log.info("Inside credit");
 
-		Account acc = findAccountEntity(accountNum);
+		Account acc = getAccountEntity(accountNum);
 		isAccountActive(acc);
 		validateCurrencyMatch(acc.getAccountNum(), acc.getCcyCode(), transactionCcy);
 
@@ -165,9 +165,9 @@ public class AccountService {
 	}
 
 	@Transactional(readOnly = true)
-	public Account getAccountById(Integer accountNum) {
+	public Account getAccountByAccountNum(String accountNum) {
 		log.info("Inside getAccountById");
-		return findAccountEntity(accountNum);
+		return getAccountEntity(accountNum);
 
 	}
 

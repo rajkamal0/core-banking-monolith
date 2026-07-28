@@ -33,7 +33,7 @@ public class TransactionService {
 	//
 	
 
-	private Transaction saveTransaction(Integer debitAcc, Integer creditAcc, BigDecimal amount,
+	private Transaction saveTransaction(String debitAcc, String creditAcc, BigDecimal amount,
 										Character txnType, String txnCcy) {
 		
 		// if transactionType is W --> toAccount should be cust_ac and fromAccount should be GL
@@ -95,7 +95,7 @@ public class TransactionService {
 	public Transaction reversal(Integer transactionID) {
 		
 		log.info("Inside reversal");
-		Transaction originalTransaction = getTransactionById(transactionID);
+		Transaction originalTransaction = getTransactionByTxnID(transactionID);
 		
 		if (originalTransaction.getTxnType()=='R'){
 			throw new CannotReverseTransactionException("Cannot reverse a reversed transaction " + transactionID);
@@ -126,8 +126,8 @@ public class TransactionService {
 	}
 	
 	@Transactional(readOnly = true)
-	public Transaction getTransactionById (Integer transactionID) {		
-		log.info("Inside getTransactionById");
+	public Transaction getTransactionByTxnID (Integer transactionID) {		
+		log.info("Inside getTransactionByTxnID");
 		return transactionRepository.findById(transactionID).orElseThrow(
 				() -> new ResourceNotFoundException("Transaction " + transactionID + " not found"));
 

@@ -26,28 +26,28 @@ public class AccountController {
 	}
 	
 	@DeleteMapping("/close/{accountNum}")
-	public ResponseEntity<Void> closeAccount(@PathVariable Integer accountNum) {
+	public ResponseEntity<Void> closeAccount(@PathVariable String accountNum) {
 		accountService.closeAccount(accountNum);
 		return ResponseEntity.noContent().build();
 	}
 	
 	@GetMapping("/checkbalance/{accountNum}")
-	public BigDecimal fetchBalance(@PathVariable Integer accountNum) {
+	public BigDecimal fetchBalance(@PathVariable String accountNum) {
 		return accountService.fetchBalance(accountNum);
 	}
 	
 	@PutMapping("/debit/{accountNum}")
-	public BigDecimal debitBalance(@PathVariable Integer accountNum, BigDecimal amount, String ccyCode) {
+	public BigDecimal debit(@PathVariable String accountNum, BigDecimal amount, String ccyCode) {
 		return accountService.debit(accountNum, amount, ccyCode);
 	}
 	
 	@PutMapping("/credit/{accountNum}")
-	public BigDecimal creditBalance(@PathVariable Integer accountNum, BigDecimal amount, String ccyCode) {
+	public BigDecimal credit(@PathVariable String accountNum, BigDecimal amount, String ccyCode) {
 		return accountService.credit(accountNum, amount, ccyCode);
 	}
 	
 	@GetMapping("/get/{accountNum}")
-	public Account getAccountDetails(@PathVariable Integer accountNum) {
-		return accountService.getAccountById(accountNum);
+	public Account getAccountByAccountNum(@PathVariable String accountNum) {
+		return accountService.getAccountByAccountNum(accountNum);
 	}
 }

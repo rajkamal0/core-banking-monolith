@@ -7,7 +7,10 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,14 +24,19 @@ import lombok.NoArgsConstructor;
 public class Transaction {
 	
 	@Id
-	@Column(name="TRANSACTION_ID")
-	private Integer txnID;
+	@Column(name="ID")
+	@GeneratedValue(generator = "t_seq_generator", strategy = GenerationType.SEQUENCE)
+	@SequenceGenerator(name = "t_seq_generator", sequenceName = "SEQ_TRANSACTION", initialValue = 1, allocationSize = 1)
+	private Integer id;
+	
+	@Column(name="TRANSACTION_ID", unique = true, nullable = false)
+	private String txnID;
 	
 	@Column(name="DEBIT_ACCOUNT")
-	private Integer debitAccount;
+	private String debitAccount;
 	
 	@Column(name="CREDIT_ACCOUNT")
-	private Integer creditAccount;
+	private String creditAccount;
 	
 	@Column(name="TXN_AMT")
 	private BigDecimal amount;
@@ -42,5 +50,10 @@ public class Transaction {
 	@UpdateTimestamp
 	@Column(name="TXN_TIME")
 	private LocalDateTime txnTime;
+	
+	public void assignTxnId(Integer txnSeqValue) {
+        this.id = txnSeqValue;
+        this.txnID = String.format("T%07d", txnSeqValue);
+    }
 
 }

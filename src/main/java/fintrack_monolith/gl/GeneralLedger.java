@@ -7,7 +7,10 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
@@ -22,8 +25,13 @@ import lombok.NoArgsConstructor;
 public class GeneralLedger {
 	
 	@Id
-	@Column(name="GL_NUMBER")
-	private Integer glNum;
+	@Column(name="ID")
+	@GeneratedValue(generator = "g_seq_generator", strategy = GenerationType.SEQUENCE)
+	@SequenceGenerator(name = "g_seq_generator", sequenceName = "SEQ_GENERALLEDGER", initialValue = 1, allocationSize = 1)
+	private Integer id;
+	
+	@Column(name="GL_NUMBER", unique = true, nullable = false)
+	private String glNum;
 	
 	@Column(name="GL_TYPE")
 	private String glType;
@@ -44,5 +52,10 @@ public class GeneralLedger {
 	@Version
 	@Column(name="VERSION")
 	private Integer version;
+	
+	public void assignGlNum(Integer glSeqValue) {
+        this.id = glSeqValue;
+        this.glNum = String.format("G%07d", glSeqValue);
+    }
 
 }

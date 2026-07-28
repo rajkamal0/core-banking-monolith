@@ -18,17 +18,17 @@ public class CustomerService {
 		this.customerRepository = customerRepository;
 	}
 	
-	private Customer findCustomerEntity(Integer customerId) {
-		log.info("Inside findCustomerEntity for Customer {}", customerId);
-		return customerRepository.findById(customerId).orElseThrow(
+	private Customer getCustomerEntity(String customerId) {
+		log.info("Inside getCustomerEntity for Customer {}", customerId);
+		return customerRepository.findByCustId(customerId).orElseThrow(
 				() -> new ResourceNotFoundException("Customer not found with ID: " + customerId));
 	}
 	
 	@Transactional(readOnly = true)
-	public Customer getCustomerById(Integer customerID) {
-		log.info("Inside getCustomerByID");
+	public Customer getCustomerByCustId(String customerID) {
+		log.info("Inside getCustomerByCustId");
 		log.info("customer ID: {}", customerID);
-		return findCustomerEntity(customerID);
+		return getCustomerEntity(customerID);
 	}
 
 	public List<Customer> getAllCustomers() {
@@ -42,12 +42,12 @@ public class CustomerService {
 		return customerRepository.save(customerDetails);
 	}
 
-	public Customer updateCustomer(Integer customerID, Customer updatedCustomerDetails) {
+	public Customer updateCustomer(String customerID, Customer updatedCustomerDetails) {
 		
 		log.info("Inside updateCustomer");
 		log.info("Customer ID: {}", customerID);
 		
-		Customer existingDetails = findCustomerEntity(customerID);
+		Customer existingDetails = getCustomerEntity(customerID);
 		
 		if(updatedCustomerDetails.getKycStatus() != null) {
 			existingDetails.setKycStatus(updatedCustomerDetails.getKycStatus());
@@ -85,11 +85,11 @@ public class CustomerService {
 		return customerRepository.save(existingDetails);
 	}
 
-	public void closeCustomer(Integer customerID) {
+	public void closeCustomer(String customerID) {
 		
 		log.info("Inside closeCustomer");
 		log.info("Closing customer: {}", customerID);
-		if (!customerRepository.existsById(customerID)) {
+		if (!customerRepository.existsByCustId(customerID)) {
 			throw new ResourceNotFoundException("Customer " + customerID + " not found");
 		}
 		// customerRepository.deleteById(customerID);

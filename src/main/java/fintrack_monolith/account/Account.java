@@ -7,7 +7,10 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
@@ -22,8 +25,13 @@ import lombok.NoArgsConstructor;
 public class Account {
 	
 	@Id
-	@Column(name="ACCOUNT_NUMBER")
-	private Integer accountNum;
+	@Column(name="ID")
+	@GeneratedValue(generator = "a_seq_generator", strategy = GenerationType.SEQUENCE)
+	@SequenceGenerator(name = "a_seq_generator", sequenceName = "SEQ_ACCOUNT", initialValue = 1, allocationSize = 1)
+	private Integer id;
+	
+	@Column(name="ACCOUNT_NUMBER", unique = true, nullable = false)
+	private String accountNum;
 	
 	@Column(name="ACC_TYPE")
 	private Character accountType;
@@ -36,7 +44,7 @@ public class Account {
 	private Character accountStatus;
 	
 	@Column(name="CUSTOMER_NO")
-	private Integer customerId;
+	private String customerId;
 	
 	@Column(name="CCY_CODE")
 	private String ccyCode;
@@ -47,5 +55,11 @@ public class Account {
 	@Version
 	@Column(name="VERSION")
 	private Integer version;
+	
+	// for generating account number
+	public void assignAccountNum(Integer accSeqValue) {
+        this.id = accSeqValue;
+        this.accountNum = String.format("A%07d", accSeqValue);
+    }
 	
 }

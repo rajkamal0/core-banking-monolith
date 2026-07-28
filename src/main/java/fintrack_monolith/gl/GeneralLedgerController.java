@@ -18,7 +18,7 @@ public class GeneralLedgerController {
 	}
 
 	@GetMapping("/checkbalance/{glNum}")
-	public BigDecimal fetchBalance(@PathVariable Integer glNum) {
+	public BigDecimal fetchBalance(@PathVariable String glNum) {
 		return generalLedgerService.fetchBalance(glNum);
 	}
 

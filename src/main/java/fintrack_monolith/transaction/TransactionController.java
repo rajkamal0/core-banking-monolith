@@ -36,8 +36,8 @@ public class TransactionController {
 	}
 	
 	@GetMapping("/get/{transactionID}")
-	public Transaction getTransactionById (@PathVariable Integer transactionID) {
-		return transactionService.getTransactionById(transactionID);
+	public Transaction getTransactionByTxnID (@PathVariable Integer transactionID) {
+		return transactionService.getTransactionByTxnID(transactionID);
 	}
 	
 }
