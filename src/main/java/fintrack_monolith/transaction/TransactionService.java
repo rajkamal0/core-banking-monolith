@@ -43,13 +43,13 @@ public class TransactionService {
 		log.info("Inside saveTransaction");
 		Transaction tx = new Transaction();
 		
-		
+		Integer nextTxnSeq = transactionRepository.getNextAccountSequence();
+		tx.assignTxnId(nextTxnSeq);
 		tx.setDebitAccount(debitAcc);
 		tx.setCreditAccount(creditAcc);
 		tx.setAmount(amount);
 		tx.setTxnType(txnType);
 		tx.setCcyCode(txnCcy);
-		// tx.setTxnID(); // should generate
 		log.info("returning from saveTransaction");
 		return transactionRepository.save(tx);
 	}

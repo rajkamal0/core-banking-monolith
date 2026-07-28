@@ -162,6 +162,8 @@ log.info("Inside creditLiabilityGL");
 	public GeneralLedger createGl(GeneralLedger GLDetails) {
 		
 		log.info("Inside createGL");
+		Integer nextGlSeq = generalLedgerRepository.getNextGlSequence();
+		GLDetails.assignGlNum(nextGlSeq);
 		GLDetails.setBalance(BigDecimal.ZERO);
 		GLDetails.setGlStatus('A');
 		log.info("returning from createGL");
