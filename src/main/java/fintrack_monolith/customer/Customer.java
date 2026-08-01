@@ -35,7 +35,7 @@ public class Customer {
 	private String lastname;
 
 	@Column(name="MOBILE")
-	private Integer mobileNum;
+	private String mobileNum;
 	
 	@Column(name="EMAIL")
 	private String email;
@@ -47,7 +47,7 @@ public class Customer {
 	private String country;
 	
 	@Column(name="PINCODE")
-	private Integer pincode;
+	private String pincode;
 	
 	@Column(name="KYC_STATUS")
 	private Boolean kycStatus;
