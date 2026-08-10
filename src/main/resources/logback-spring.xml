@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- 1. Bridge properties from application.properties -->
+    <springProperty scope="context" name="LOG_PATH" source="logging.file.path" defaultValue="logs" />
+    <springProperty scope="context" name="LOG_FILE_NAME" source="logging.file.name" defaultValue="fintrack" />
+    <springProperty scope="context" name="ROOT_LOG_LEVEL" source="logging.level.root" defaultValue="INFO" />
+    <springProperty scope="context" name="APP_LOG_LEVEL" source="logging.level.app" defaultValue="DEBUG" />
+
+
+    <!-- 2. Console Appender -->
+    <appender name="ConsoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) [%thread] %cyan(%logger{36}) - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+
+    <!-- 3. General Rolling File Appender (Modern Size + Time Policy) -->
+    <appender name="RollingFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/${LOG_FILE_NAME}.log</file>
+
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n</pattern>
+        </encoder>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- %i is required for size-based rollover index -->
+            <fileNamePattern>${LOG_PATH}/archived/${LOG_FILE_NAME}-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>3GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+
+    <!-- 4. Isolated Error File Appender (Modern Size + Time Policy) -->
+    <appender name="ErrorFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/${LOG_FILE_NAME}-error.log</file>
+
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n</pattern>
+        </encoder>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/archived/${LOG_FILE_NAME}-error-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+
+    <!-- 5. Application Package Logger -->
+    <logger name="com.example" level="${APP_LOG_LEVEL}" additivity="false">
+        <appender-ref ref="ConsoleAppender" />
+        <appender-ref ref="RollingFileAppender" />
+        <appender-ref ref="ErrorFileAppender" />
+    </logger>
+
+
+    <!-- 6. Root Logger -->
+    <root level="${ROOT_LOG_LEVEL}">
+        <appender-ref ref="ConsoleAppender" />
+        <appender-ref ref="RollingFileAppender" />
+        <appender-ref ref="ErrorFileAppender" />
+    </root>
+
+</configuration>
