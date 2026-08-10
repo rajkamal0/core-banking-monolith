@@ -1,6 +1,7 @@
 package fintrack_monolith.account;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -67,7 +68,7 @@ public class AccountService {
 	
 	private void validateCurrencyMatch(String accountNum, String accountCcy, String transactionCcy) {
 		log.info("Inside validateCurrencyMatch");
-		if(accountCcy != transactionCcy) {
+		if(! accountCcy.equals(transactionCcy)) {
 			log.warn("CURRENCY MISMATCH");
 			// log.warn("Account {}'s currency - {} and Transaction currency - {}", accountNum, accountCcy, transactionCcy);
 			throw new CurrencyMismatchException("Account ccy is " + accountCcy + " and Transaction ccy is " + transactionCcy);
@@ -95,6 +96,7 @@ public class AccountService {
 		return accountRepository.save(accountDetails);
 	}
 
+	@Transactional
 	public void closeAccount(String accountNum) {
 		
 		log.info("Inside closeAccount");
@@ -108,6 +110,7 @@ public class AccountService {
 		log.info("returning from closeAccount");
 	}
 
+	@Transactional(readOnly = true)
 	public BigDecimal fetchBalance(String accountNum) {
 		log.info("Inside fetchBalance");
 		BigDecimal accountBalance = getAccountEntity(accountNum).getBalance();
@@ -171,6 +174,19 @@ public class AccountService {
 		log.info("Inside getAccountById");
 		return getAccountEntity(accountNum);
 
+	}
+	
+	@Transactional(readOnly = true)
+	public List<Account> getAccountsByCustomerId(String customerId) {
+		log.info("Inside getAccountsByCustomerId");
+		return accountRepository.findByCustomerId(customerId);
+
+	}
+	
+	@Transactional(readOnly = true)
+	public boolean hasActiveAccountsByCustomerId(String customerId) {
+		log.info("Inside hasActiveAccountsByCustomerId for customer: {}", customerId);
+		return accountRepository.existsByCustomerIdAndAccountStatus(customerId, 'A');
 	}
 
 }

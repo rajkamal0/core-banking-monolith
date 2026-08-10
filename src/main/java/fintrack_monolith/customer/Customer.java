@@ -52,6 +52,10 @@ public class Customer {
 	@Column(name="KYC_STATUS")
 	private Boolean kycStatus;
 	
+	@Column(name="IS_ACTIVE")
+	private Boolean isActive;
+	
+	
 	// for generating customer id
 	@PrePersist
 	public void assignCustId() {

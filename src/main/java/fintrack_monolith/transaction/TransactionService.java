@@ -92,7 +92,7 @@ public class TransactionService {
 	}
 
 	@Transactional
-	public Transaction reversal(Integer transactionID) {
+	public Transaction reversal(String transactionID) {
 		
 		log.info("Inside reversal");
 		Transaction originalTransaction = getTransactionByTxnID(transactionID);
@@ -126,9 +126,9 @@ public class TransactionService {
 	}
 	
 	@Transactional(readOnly = true)
-	public Transaction getTransactionByTxnID (Integer transactionID) {		
+	public Transaction getTransactionByTxnID (String transactionID) {		
 		log.info("Inside getTransactionByTxnID");
-		return transactionRepository.findById(transactionID).orElseThrow(
+		return transactionRepository.findByTxnID(transactionID).orElseThrow(
 				() -> new ResourceNotFoundException("Transaction " + transactionID + " not found"));
 
 	}

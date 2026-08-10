@@ -31,12 +31,12 @@ public class TransactionController {
 	}
 	
 	@PostMapping("/reversal/{transactionID}")
-	public Transaction reversal(@PathVariable Integer transactionID) {
+	public Transaction reversal(@PathVariable String transactionID) {
 		return transactionService.reversal(transactionID);
 	}
 	
 	@GetMapping("/get/{transactionID}")
-	public Transaction getTransactionByTxnID (@PathVariable Integer transactionID) {
+	public Transaction getTransactionByTxnID (@PathVariable String transactionID) {
 		return transactionService.getTransactionByTxnID(transactionID);
 	}
 	

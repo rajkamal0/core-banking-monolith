@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,7 +26,7 @@ public class GeneralLedgerController {
 	}
 	
 	@PostMapping("/create")
-	public GeneralLedger createGl(GeneralLedger GLDetails) {
+	public GeneralLedger createGl(@RequestBody GeneralLedger GLDetails) {
 		return generalLedgerService.createGl(GLDetails);
 	}
 	
@@ -33,6 +34,11 @@ public class GeneralLedgerController {
 	public ResponseEntity<Void> closeGl(@PathVariable String glNum) {
 		generalLedgerService.closeGl(glNum);
 		return ResponseEntity.noContent().build();
+	}
+	
+	@GetMapping("/get/{glNum}")
+	public GeneralLedger getGlByGlNum(@PathVariable String glNum) {
+		return generalLedgerService.getGlByGlNum(glNum);
 	}
 
 }

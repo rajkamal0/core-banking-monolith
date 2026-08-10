@@ -13,12 +13,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import fintrack_monolith.orchestrator.CustomerAccountOrchestrator;
+
 @RestController
 @RequestMapping("/customer")
 public class CustomerController {
 	
 	@Autowired
 	CustomerService customerService;
+	
+	@Autowired
+	CustomerAccountOrchestrator customerAccountOrchestrator;
 
 	@GetMapping("/get/{customerID}")
 	public Customer getCustomerByCustId(@PathVariable String customerID) {
@@ -42,7 +47,7 @@ public class CustomerController {
 	
 	@PutMapping("/close/{customerID}")
 	public ResponseEntity<Void> closeCustomer(@PathVariable String customerID) {
-		customerService.closeCustomer(customerID);
+		customerAccountOrchestrator.closeCustomer(customerID);
 		return ResponseEntity.noContent().build();
 	}
 	

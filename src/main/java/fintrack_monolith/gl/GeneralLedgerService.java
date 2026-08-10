@@ -41,7 +41,7 @@ public class GeneralLedgerService {
 	
 	private void validateCurrencyMatch(String glNum, String glCcy, String transactionCcy) {
 		log.info("Inside validateCurrencyMatch");
-		if(glCcy != transactionCcy) {
+		if(! glCcy.equals(transactionCcy)) {
 			log.warn("CURRENCY MISMATCH");
 			throw new CurrencyMismatchException("General Ledger " + glNum + " ccy is " + glCcy + " and Transaction ccy is " + transactionCcy);
 		}
@@ -150,6 +150,7 @@ log.info("Inside creditLiabilityGL");
 		
 	}
 	
+	@Transactional(readOnly = true)
 	public BigDecimal fetchBalance(String glNum) {
 		log.info("Inside fetchBalance");
 		BigDecimal glBalance = getGlEntity(glNum).getBalance();
@@ -164,13 +165,13 @@ log.info("Inside creditLiabilityGL");
 		log.info("Inside createGL");
 //		Integer nextGlSeq = generalLedgerRepository.getNextGlSequence();
 //		GLDetails.assignGlNum(nextGlSeq);
-		GLDetails.setBalance(BigDecimal.ZERO);
+//		GLDetails.setBalance(BigDecimal.ZERO);
 		GLDetails.setGlStatus('A');
 		log.info("returning from createGL");
 		return generalLedgerRepository.save(GLDetails);
 	}
 
-	
+	@Transactional
 	public void closeGl(String glNum) {
 		log.info("Inside closeGl");
 		GeneralLedger gl = getGlEntity(glNum);

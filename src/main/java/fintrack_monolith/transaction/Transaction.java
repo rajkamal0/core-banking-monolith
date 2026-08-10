@@ -10,6 +10,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -51,6 +52,7 @@ public class Transaction {
 	@Column(name="TXN_TIME")
 	private LocalDateTime txnTime;
 	
+	@PrePersist
 	public void assignTxnId() {
 //        this.id = txnSeqValue;
 		if(this.id != null) {

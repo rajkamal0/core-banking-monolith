@@ -100,7 +100,7 @@ public class GlobalExceptionHandler {
 	
 	@ExceptionHandler(IncorrectTransactionTypeException.class)
 	public ResponseEntity<ErrorDetails> handleIncorrectTransactionTypeException(IncorrectTransactionTypeException ex){
-		log.info("Inside handleCurrencyMismatchException");
+		log.info("Inside handleIncorrectTransactionTypeException");
 		log.warn("IncorrectTransactionTypeException: {}", ex.getMessage());
 		ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(), 
 													 HttpStatus.BAD_REQUEST.value(),
@@ -109,4 +109,18 @@ public class GlobalExceptionHandler {
 		log.warn("returning from handleIncorrectTransactionTypeException");
 		return new ResponseEntity<ErrorDetails>(errorDetails, HttpStatus.BAD_REQUEST);
 	}
+	
+	@ExceptionHandler(CannotCloseCustomerException.class)
+	public ResponseEntity<ErrorDetails> handleCannotCloseCustomerException(CannotCloseCustomerException ex){
+		log.info("Inside handleCannotCloseCustomerException");
+		log.warn("CannotCloseCustomerException: {}", ex.getMessage());
+		ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(), 
+													 HttpStatus.CONFLICT.value(),
+													 "CUSTOMER_CLOSURE_FAILED",
+													 ex.getMessage());
+		log.warn("returning from CannotCloseCustomerException");
+		return new ResponseEntity<ErrorDetails>(errorDetails, HttpStatus.CONFLICT);
+	
+	}
+
 }
